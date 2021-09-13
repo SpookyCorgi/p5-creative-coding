@@ -1,8 +1,65 @@
 html, body {
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+  width: 100%;
 }
 
 canvas {
   display: block;
+}
+
+h1, h2, h3, h4 ,h5 ,h6{
+  font-family: 'Rubik', sans-serif;
+  color: #ccffff;
+  text-shadow: 0 0 10px #ccffff;
+}
+
+h1{
+  font-size: 48px;
+}
+
+h2{
+  font-size: 36px;
+}
+
+h3{
+  font-size: 24px;
+}
+
+.project-item{
+  display: flex;
+  flex-direction: column;
+  font-family: 'Rubik', sans-serif;
+  color: #ccffff;
+  font-size: 48px;
+  text-decoration: none;
+  margin: 20px;
+}
+
+.projects{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-items: flex-start;
+  margin: 0 20px 0 20px;
+  width: 100%;
+}
+
+.title{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  width: 100%;
+  margin-left: 40px;
+}
+
+@media (min-width:992px){
+  body{
+    width: 960px;
+  }
 }
