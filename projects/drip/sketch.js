@@ -1,9 +1,8 @@
 //There is a checkbox under the drawing! Check it out!
 let spiral = [];
-let width = 800
-let height = 800
 let checkbox
-let animation = false
+let animation = true
+
 function init () {
   //change values here to experient!!
   //initial value for cos, sin and distance between spirals
@@ -34,13 +33,17 @@ function init () {
 }
 
 function setup () {
-  createCanvas(width, height, WEBGL);
+  createCanvas(windowWidth, windowHeight, WEBGL);
   init();
-  checkbox = createCheckbox('Animation', false);
-  checkbox.changed(animationChange);
+  //checkbox = createCheckbox('Animation', false);
+  //checkbox.changed(animationChange);
 }
 
-function animationChange () {
+function windowResized () {
+  resizeCanvas(windowWidth, windowHeight)
+}
+
+/*function animationChange () {
   if (this.checked()) {
     //start animation
     animation = true
@@ -51,7 +54,9 @@ function animationChange () {
     animation = false
     noLoop()
   }
-}
+}*/
+
+
 
 function draw () {
   background(0);
