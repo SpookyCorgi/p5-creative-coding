@@ -1,80 +1,134 @@
-//There is a checkbox under the drawing! Check it out!
-let spiral = [];
-let checkbox
-let animation = true
-
-function init () {
-  //change values here to experient!!
-  //initial value for cos, sin and distance between spirals
-  let x, y, r;
-  x = y = 0;
-  r = 0;
-  //initial size for the object
-  let size = 5;
-  //total amount of the object
-  let totalCount = 200;
-
-  for (let i = 0; i < totalCount; i++) {
-    //creating the circles
-    let circle = {
-      x: r * cos(x),
-      y: r * sin(y),
-      size: size,
-      //color: color(random(255),random(255),random(255),150),
-    };
-    spiral.push(circle);
-
-    //increments of the values
-    x += PI / 10;
-    y += PI / 10;
-    r += 2;
-    size *= 1.015;
-  }
-}
+let dripInterval = 0 //interval of each drip
+let lastDripTime = 0 //last drip time for the timer
+let dripQueue = [] //queue storing drips
+const gravity = 0.00098 //gravity const for the drips
 
 function setup () {
-  createCanvas(windowWidth, windowHeight, WEBGL);
-  init();
-  //checkbox = createCheckbox('Animation', false);
-  //checkbox.changed(animationChange);
+  //init canvas variables in setup
+  createCanvas(windowWidth, windowHeight);
+  noFill()
+  stroke(255)
 }
-
-function windowResized () {
-  resizeCanvas(windowWidth, windowHeight)
-}
-
-/*function animationChange () {
-  if (this.checked()) {
-    //start animation
-    animation = true
-    loop()
-    console.log('Animation Start!');
-  } else {
-    //stop loop to save browser memory and power
-    animation = false
-    noLoop()
-  }
-}*/
-
-
 
 function draw () {
   background(0);
+  if (millis() - lastDripTime > dripInterval) {//timer
+    let drip = new Drip() //new drip!
+    dripQueue.push(drip) //store the drip in the queue
+    dripInterval = random(1000, 5000) //create a random time interval for the next drip!
+    lastDripTime = millis()//store time for the timer
+  }
+  dripQueue.forEach((d, i) => {
+    if (d.state === "dead") {
+      dripQueue.splice(i, 1);//remove the dead drips from the queue, always important to do memory management
+    }
+    d.display()//draw the drips!
+  })
+}
 
-  //draw all the spirals initialized
-  spiral.forEach((d, i) => {
-    //there are 20 circles per ring, thus module i by 20
-    if (i % 20 == 0) {
-      if (animation) {
-        //millis will increase through time, making result an animation
-        rotateY(millis() / 10000);
-      } else {
-        //i is always the same each loop regardless of time
-        rotateY(i / 6);
+function windowResized () {
+  resizeCanvas(windowWidth, windowHeight)//resize canvas when window is resized
+}
+
+//the ripple class!
+class Ripple {
+  x = 0
+  y = 0
+  w = 0
+  h = 0
+  wSpeed = 2
+  hSpeed = 0.5
+  strokeColor = 255
+  state = "growing"
+
+  constructor(x, y, w, h) {
+    //initialize the variables for the ellipse
+    this.x = x
+    this.y = y
+    this.w = w
+    this.h = h
+  }
+
+  display () {
+    this.w += this.wSpeed //increase the width of the ellipse
+    this.h += this.hSpeed //increase the height of the ellipse
+    this.strokeColor-- //decrease the color of the ellipse
+    if (this.strokeColor <= 0) {
+      this.state = "dead" //if the color reaches 0, change state to dead
+    }
+
+    if (this.state === "growing") {// if the state is growing draw the ripple!
+      stroke(this.strokeColor)
+      ellipse(this.x, this.y, this.w, this.h)
+    }
+  }
+}
+
+class Drip {
+  x = 0
+  y = 0
+  initY = 50
+  wSize = 0
+  hSize = 0
+  maxSize = random(30, 150)
+  state = "growing"
+  dropTime = 0
+  growSpeed = 1.5
+  lastRippleTime = 0
+  rippleTime = 1000
+  rippleQueue = []
+  rippleAmount = 0
+  shrinkSpeed = 2
+
+  constructor(x = random(this.maxSize / 2, windowWidth - this.maxSize / 2), y = this.initY) {//init x according to drip size
+    this.x = x
+    this.y = y
+  }
+
+  grow () {
+    if (this.wSize < this.maxSize) {//increase the circle until it reaches maxsize
+      this.wSize += this.growSpeed
+      this.hSize += this.growSpeed
+    } else if (this.state === "growing") {
+      this.state = "dropping"//if reached max size starts dropping
+      this.dropTime = millis()
+    }
+  }
+
+  display () {
+    this.grow()
+
+    if (this.state === "dropping") {
+      this.hSize++
+      this.y = this.initY + gravity * (millis() - this.dropTime) * (millis() - this.dropTime)//calculate position according to gravity
+      if (this.y > windowHeight - 100 - this.maxSize / 2) {
+        this.state = "dropped"//if reach the bottom change state to dropped
       }
     }
-    //fill(d.color);
-    normalMaterial();
-    ellipse(d.x, d.y, d.size, d.size);
-  });
+
+    if (this.state === "dropped" && this.rippleAmount <= (this.maxSize / 50)) {//if state is dropped and amount of ripple is smaller than the suppose amount
+      if ((millis() - this.lastRippleTime) > this.rippleTime) {//ripple timer
+        this.lastRippleTime = millis()
+        let ripple = new Ripple(this.x, this.y, this.wSize, this.wSize)//create new ripple, purposely use wSize on both width and height otherwise it'll look weird
+        this.rippleQueue.push(ripple)//push the new ripple to queue
+        this.rippleAmount++//counting
+      }
+    }
+
+    if (this.state == "growing" || this.state == "dropping") {
+      stroke(255)
+      ellipse(this.x, this.y, this.wSize, this.hSize)//draw ellipse at appropiate states
+    }
+
+    this.rippleQueue.forEach((d, i) => {
+      d.display()//draw all ripple
+      if (d.state === "dead") {
+        this.rippleQueue.splice(i, 1)//if ripple is dead, remove it from queue
+      }
+    })
+
+    if (this.state === "dropped" && this.rippleQueue.length == 0) {
+      this.state = "dead"//if circle is dropped and all ripple ends, change state to dead
+    }
+  }
 }

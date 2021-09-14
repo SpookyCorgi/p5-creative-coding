@@ -9,10 +9,10 @@ html, body, .content {
   width: 100%;
 }
 
-h1, h2, h3, h4 ,h5 ,h6{
+h1, h2, h3, h4 ,h5 ,h6, a{
   font-family: 'Rubik', sans-serif;
-  color: #ccffff;
-  text-shadow: 0 0 10px #ccffff;
+  color: #ffffff;
+
 }
 
 h1{
@@ -27,11 +27,21 @@ h3{
   font-size: 24px;
 }
 
+.neon{
+  text-shadow: 
+  0 0 7px #fff,
+  0 0 10px #52ffff,
+  0 0 21px #52ffff,
+  0 0 42px #52ffff;
+}
+
+.colored{
+  color: #ccffff;
+}
+
 .project-item{
   display: flex;
   flex-direction: column;
-  font-family: 'Rubik', sans-serif;
-  color: #ccffff;
   font-size: 48px;
   text-decoration: none;
   padding: 20px;
