@@ -47,10 +47,8 @@ a{
 
 .neon{
   text-shadow: 
-  0 0 7px #fff,
-  0 0 10px #52ffff,
-  0 0 21px #52ffff,
-  0 0 42px #52ffff;
+  0 0 10px #fff,
+  0 0 20px #52ffff;
 }
 
 .colored{
@@ -69,8 +67,7 @@ a{
   margin-top: 20px;
   box-shadow: 
   0 0 10px #fff,
-  0 0 20px #52ffff,
-  0 0 30px #52ffff;
+  0 0 20px #52ffff;
 }
 
 .projects{
