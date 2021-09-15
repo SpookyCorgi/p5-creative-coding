@@ -2,7 +2,8 @@ let dripInterval = 0 //interval of each drip
 let lastDripTime = 0 //last drip time for the timer
 let dripQueue = [] //queue storing drips
 const gravity = 0.00098 //gravity const for the drips
-let mouseCurrentDrip
+let mouseCurrentDrip //current droplet generate by clicking
+let dripGrowing = false
 
 function setup () {
   //init canvas variables in setup
@@ -30,14 +31,20 @@ function draw () {
 }
 
 function mousePressed () {
-  let drip = new Drip(mouseX, mouseY, color(random(255), random(255), random(255))) //new drip!
-  mouseCurrentDrip = drip
-  mouseCurrentDrip.maxSize = 10000
-  dripQueue.push(drip) //store the drip in the queue
+  if (!dripGrowing) {
+    dripGrowing = true
+    let drip = new Drip(mouseX, mouseY, color(random(255), random(255), random(255))) //new drip!
+    mouseCurrentDrip = drip
+    mouseCurrentDrip.maxSize = 10000 //set maxsize to a high amount so the droplet wont drop automatically
+    dripQueue.push(drip) //store the drip in the queue
+  }
 }
 
 function mouseReleased () {
-  mouseCurrentDrip.drop()
+  if (dripGrowing) {
+    mouseCurrentDrip.drop()//drop when mouse release
+    dripGrowing = false
+  }
 }
 
 function windowResized () {
@@ -133,7 +140,7 @@ class Drip {
       }
     }
 
-    if (this.state === "dropped" && this.rippleAmount <= (this.wSize / 30)) {//if state is dropped and amount of ripple is smaller than the suppose amount
+    if (this.state === "dropped" && this.rippleAmount <= (this.wSize / 20)) {//if state is dropped and amount of ripple is smaller than the suppose amount
       if ((millis() - this.lastRippleTime) > this.rippleTime) {//ripple timer
         this.lastRippleTime = millis()
         let ripple
