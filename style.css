@@ -47,8 +47,7 @@ a{
 
 .neon{
   text-shadow: 
-  0 0 10px #fff,
-  0 0 20px #52ffff;
+  0 0 20px #ccffff;
 }
 
 .colored{
@@ -66,8 +65,7 @@ a{
 .project-item img{
   margin-top: 20px;
   box-shadow: 
-  0 0 10px #fff,
-  0 0 20px #52ffff;
+  0 0 20px #ccffff;
 }
 
 .projects{
@@ -82,6 +80,7 @@ a{
   flex-wrap: wrap;
   flex-direction: column;
   padding-left: 40px;
+  padding-right: 40px;
 }
 
 .home-btn{
