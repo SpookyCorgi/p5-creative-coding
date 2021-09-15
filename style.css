@@ -1,4 +1,4 @@
-html, body, .content {
+html, body {
   margin: 0;
   padding: 0;
   display: flex;
@@ -7,12 +7,26 @@ html, body, .content {
   justify-content: center;
   background-color: black;
   width: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
+}
+
+.content{
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: black;
+  width: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
 }
 
 h1, h2, h3, h4 ,h5 ,h6, a{
   font-family: 'Rubik', sans-serif;
   color: #ffffff;
-
 }
 
 h1{
@@ -25,6 +39,10 @@ h2{
 
 h3{
   font-size: 24px;
+}
+
+a{
+  text-decoration: none;
 }
 
 .neon{
@@ -43,8 +61,16 @@ h3{
   display: flex;
   flex-direction: column;
   font-size: 48px;
-  text-decoration: none;
-  padding: 20px;
+  padding-left: 40px;
+  padding-bottom: 40px;
+}
+
+.project-item img{
+  margin-top: 20px;
+  box-shadow: 
+  0 0 10px #fff,
+  0 0 20px #52ffff,
+  0 0 30px #52ffff;
 }
 
 .projects{
@@ -52,16 +78,19 @@ h3{
   flex-direction: row;
   flex-wrap: wrap;
   justify-items: flex-start;
-  padding: 0 20px 0 20px;
-  width: 100%;
 }
 
 .title{
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
-  width: 100%;
   padding-left: 40px;
+}
+
+.home-btn{
+  position: absolute;
+  top:0px;
+  left:20px;
 }
 
 @media (min-width:992px){
