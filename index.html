@@ -4,8 +4,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Cheng-Chi Lee's Creative Coding Projects</title>
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.svg">
+  <title>James Lee's Creative Coding Projects</title>
 
   <link rel="stylesheet" type="text/css" href="style.css">
   <!--https://animate.style/-->
@@ -15,6 +15,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=Rubik:wght@300&display=swap"
     rel="stylesheet">
+  <!--jquery-->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -27,7 +30,7 @@
       <h3 class="animate__animated animate__lightSpeedInLeft animate__delay-2s colored">Here is the list of them!</h3>
     </div>
 
-    <div class="projects animate__animated animate__lightSpeedInLeft animate__delay-2s">
+    <div id="projects" class="projects animate__animated animate__lightSpeedInLeft animate__delay-3s">
       <a class="project-item neon" href="./projects/spiral/index.html">S p i r a l
         <img src="assets/spiral_thumb.png" alt="This is a thumbnail"></a>
       <a class="project-item neon" href="./projects/drip/index.html">D r i p
@@ -35,5 +38,16 @@
     </div>
   </div>
 </body>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    window.setTimeout(scrollToProjects, 3000)
+    function scrollToProjects() {
+      $('html, body').animate({
+        scrollTop: $('#projects').offset().top
+      }, 1000)
+    }
+
+  });</script>
 
 </html>
