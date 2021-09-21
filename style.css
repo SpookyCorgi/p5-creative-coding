@@ -11,10 +11,7 @@ html, body, main {
   -moz-box-sizing: border-box;
        box-sizing: border-box;
   -webkit-user-select: none;
-}
-
-img, canvas{
-  -webkit-user-select: none;
+  -webkit-user-drag: none;
 }
 
 .content{
