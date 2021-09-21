@@ -1,4 +1,4 @@
-html, body,main {
+html, body, main {
   margin: 0;
   padding: 0;
   display: flex;
@@ -10,6 +10,7 @@ html, body,main {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
        box-sizing: border-box;
+  -webkit-user-select: none;
 }
 
 .content{
