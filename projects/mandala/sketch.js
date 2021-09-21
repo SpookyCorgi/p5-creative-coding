@@ -73,11 +73,15 @@ function draw () {
     }
 
     if (windowWidth > windowHeight) {
-        image(graphic, 0, windowHeight / 2 - windowWidth / 4, windowWidth / 2, windowWidth / 2)
-        image(graphic, windowWidth / 2, windowHeight / 2 - windowWidth / 4, windowWidth / 2, windowWidth / 2)
+        image(graphic, windowWidth / 2 - windowHeight / 2 - windowHeight / 4 - windowWidth / 4, windowHeight / 2 - windowWidth / 4, windowWidth / 2, windowWidth / 2)
+        image(graphic, windowWidth / 2 + windowHeight / 2 + windowHeight / 4 - windowWidth / 4, windowHeight / 2 - windowWidth / 4, windowWidth / 2, windowWidth / 2)
+        //image(graphic, windowWidth / 2 - windowHeight, windowHeight / 2 - windowWidth / 8, windowWidth / 4, windowWidth / 4)
+        //image(graphic, windowWidth / 2 + windowHeight / 2, windowHeight / 2 - windowWidth / 8, windowWidth / 4, windowWidth / 4)
     } else {
-        image(graphic, windowWidth / 2 - windowHeight / 4, 0, windowHeight / 2, windowHeight / 2)
-        image(graphic, windowWidth / 2 - windowHeight / 4, windowHeight / 2, windowHeight / 2, windowHeight / 2)
+        image(graphic, windowWidth / 2 - windowHeight / 4, windowHeight / 2 - windowWidth / 2 - windowWidth / 4 - windowHeight / 4, windowHeight / 2, windowHeight / 2)
+        image(graphic, windowWidth / 2 - windowHeight / 4, windowHeight / 2 + windowWidth / 2 + windowWidth / 4 - windowHeight / 4, windowHeight / 2, windowHeight / 2)
+        //image(graphic, windowWidth / 2 - windowHeight / 8, windowHeight / 2 - windowWidth, windowHeight / 4, windowHeight / 4)
+        //image(graphic, windowWidth / 2 - windowHeight / 8, windowHeight / 2 + windowWidth / 2, windowHeight / 4, windowHeight / 4)
     }
 
     /*
