@@ -1,26 +1,27 @@
-let rot = 0
-let wScl = 1
-let hScl = 1
-let sclDir = 1
-let xTrans = 0
-let yTrans = 0
-
 let creatingShape = false
 let shapeSize = 0
 let shapeSizeIncreasingSpeed = 1
 let newShape = {}
 let shapeQueue = []
+const shapePerCircle = 200
+const shapeInterval = 20
+let graphic
 
 function setup () {
     createCanvas(windowWidth, windowHeight)
     background(0)
-    stroke(255, 100)
+    stroke(255)
     rectMode(CENTER)
     noFill()
+    graphic = createGraphics(windowWidth, windowHeight);
+    graphic.rectMode(CENTER)
+    graphic.noFill()
+
 }
 
 function windowResized () {
     resizeCanvas(windowWidth, windowHeight)
+    graphic.resizeCanvas(windowWidth, windowHeight)
 }
 
 function mousePressed () {
@@ -29,8 +30,18 @@ function mousePressed () {
 
 function mouseReleased () {
     creatingShape = false
-    shapeQueue.push([newShape])
+    //shapeQueue.push({ shape: newShape, count: 1 })
     shapeSize = 0
+    let s = newShape
+    for (let i = 0; i < shapePerCircle; i++) {
+        setTimeout(() => {
+            graphic.push()
+            graphic.translate(windowWidth / 2, windowHeight / 2)
+            graphic.rotate(i * PI / shapePerCircle * 2)
+            graphic.rect(s.x - windowWidth / 2, s.y - windowHeight / 2, s.size, s.size)
+            graphic.pop()
+        }, i * shapeInterval)
+    }
 }
 
 function draw () {
@@ -39,21 +50,23 @@ function draw () {
 
     if (creatingShape) {
         shapeSize += shapeSizeIncreasingSpeed
-        let obj = { x: mouseX, y: mouseY, size: shapeSize, rot: 0 }
-        newShape = Object.assign({}, obj)
-        rect(obj.x, obj.y, obj.size, obj.size)
+        newShape = { x: mouseX, y: mouseY, size: shapeSize }
+        rect(newShape.x, newShape.y, newShape.size, newShape.size)
     }
 
-    shapeQueue.forEach(shape => {
-        shape.forEach(d => {
+    image(graphic, 0, 0, windowWidth, windowHeight)
+
+    /*
+    shapeQueue.forEach(d => {
+        for (let i = 0; i < d.count; i++) {
             push()
             translate(windowWidth / 2, windowHeight / 2)
-            rotate(d.rot)
-            rect(d.x - windowWidth / 2, d.y - windowHeight / 2, d.size, d.size)
+            rotate(i * PI / shapePerCircle * 2)
+            rect(d.shape.x - windowWidth / 2, d.shape.y - windowHeight / 2, d.shape.size, d.shape.size)
             pop()
-        })
-        if (shape.length < 200) {
-            shape.push({ x: shape[0].x, y: shape[0].y, size: shape[0].size, rot: shape.length * PI / 100 })
         }
-    })
+        if (d.count < shapePerCircle) {
+            d.count++
+        }
+    })*/
 }
