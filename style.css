@@ -13,6 +13,10 @@ html, body, main {
   -webkit-user-select: none;
 }
 
+img, canvas{
+  -webkit-user-select: none;
+}
+
 .content{
   margin: 0;
   padding: 0;
