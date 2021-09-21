@@ -1,4 +1,4 @@
-html, body,main {
+html, body {
   margin: 0;
   padding: 0;
   display: flex;
@@ -9,8 +9,13 @@ html, body,main {
   width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  box-sizing: border-box;
+       box-sizing: border-box;
+}
 
+img, canvas{
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  pointer-events: none;
 }
 
 .content{
