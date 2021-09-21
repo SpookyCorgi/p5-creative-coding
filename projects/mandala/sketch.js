@@ -13,7 +13,12 @@ function setup () {
     stroke(255)
     rectMode(CENTER)
     noFill()
-    graphic = createGraphics(windowWidth, windowHeight);
+    if (windowWidth > windowHeight) {
+        graphic = createGraphics(windowWidth, windowWidth);
+    } else {
+        graphic = createGraphics(windowHeight, windowHeight);
+    }
+
     graphic.rectMode(CENTER)
     graphic.noFill()
 
@@ -21,7 +26,11 @@ function setup () {
 
 function windowResized () {
     resizeCanvas(windowWidth, windowHeight)
-    graphic.resizeCanvas(windowWidth, windowHeight)
+    if (windowWidth > windowHeight) {
+        graphic.resizeCanvas(windowWidth, windowWidth)
+    } else {
+        graphic.resizeCanvas(windowHeight, windowHeight)
+    }
 }
 
 function mousePressed () {
@@ -36,7 +45,11 @@ function mouseReleased () {
     for (let i = 0; i < shapePerCircle; i++) {
         setTimeout(() => {
             graphic.push()
-            graphic.translate(windowWidth / 2, windowHeight / 2)
+            if (windowWidth > windowHeight) {
+                graphic.translate(windowWidth / 2, windowWidth / 2)
+            } else {
+                graphic.translate(windowHeight / 2, windowHeight / 2)
+            }
             graphic.rotate(i * PI / shapePerCircle * 2)
             graphic.rect(s.x - windowWidth / 2, s.y - windowHeight / 2, s.size, s.size)
             graphic.pop()
@@ -53,8 +66,19 @@ function draw () {
         newShape = { x: mouseX, y: mouseY, size: shapeSize }
         rect(newShape.x, newShape.y, newShape.size, newShape.size)
     }
+    if (windowWidth > windowHeight) {
+        image(graphic, 0, (windowHeight - windowWidth) / 2, windowWidth, windowWidth)
+    } else {
+        image(graphic, (windowWidth - windowHeight) / 2, 0, windowHeight, windowHeight)
+    }
 
-    image(graphic, 0, 0, windowWidth, windowHeight)
+    if (windowWidth > windowHeight) {
+        image(graphic, 0, windowHeight / 2 - windowWidth / 4, windowWidth / 2, windowWidth / 2)
+        image(graphic, windowWidth / 2, windowHeight / 2 - windowWidth / 4, windowWidth / 2, windowWidth / 2)
+    } else {
+        image(graphic, windowWidth / 2 - windowHeight / 4, 0, windowHeight / 2, windowHeight / 2)
+        image(graphic, windowWidth / 2 - windowHeight / 4, windowHeight / 2, windowHeight / 2, windowHeight / 2)
+    }
 
     /*
     shapeQueue.forEach(d => {
