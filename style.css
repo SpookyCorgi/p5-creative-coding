@@ -12,6 +12,11 @@ html, body {
        box-sizing: border-box;
 }
 
+img{
+  -webkit-touch-callout: none;
+  pointer-events: none;
+}
+
 .content{
   margin: 0;
   padding: 0;
