@@ -17,7 +17,8 @@ function windowResized () {
     init()
 }
 
-function mousePressed () {
+//mousepressed will be triggered twice on mobile so clicked is used
+function mouseClicked () {
     let allFall = true
     for (let i = 0; i < xAmount; i++) {
         for (let j = 0; j < yAmount; j++) {
@@ -33,12 +34,10 @@ function mousePressed () {
                 dominos[i][j].standUp()
             }
         }
-        console.log('a')
     } else {
         let x = int((mouseX - paddingLeft) / gridSize)
         let y = int((mouseY - paddingTop) / gridSize)
         dominos[x][y].fall()
-        console.log('b')
     }
 }
 
@@ -135,6 +134,7 @@ class Domino {
 
     standUp () {
         this.state = "still"
+        this.angle = 0
     }
 }
 //prevent context menu when long touch
