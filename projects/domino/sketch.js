@@ -18,9 +18,28 @@ function windowResized () {
 }
 
 function mousePressed () {
-    let x = int((mouseX - paddingLeft) / gridSize)
-    let y = int((mouseY - paddingTop) / gridSize)
-    dominos[x][y].fall()
+    let allFall = true
+    for (let i = 0; i < xAmount; i++) {
+        for (let j = 0; j < yAmount; j++) {
+            if (dominos[i][j].state != "fall") {
+                allFall = false
+            }
+        }
+    }
+
+    if (allFall) {
+        for (let i = 0; i < xAmount; i++) {
+            for (let j = 0; j < yAmount; j++) {
+                dominos[i][j].standUp()
+            }
+        }
+        console.log('a')
+    } else {
+        let x = int((mouseX - paddingLeft) / gridSize)
+        let y = int((mouseY - paddingTop) / gridSize)
+        dominos[x][y].fall()
+        console.log('b')
+    }
 }
 
 function init () {
@@ -112,6 +131,10 @@ class Domino {
                 }
             }, 200)
         }
+    }
+
+    standUp () {
+        this.state = "still"
     }
 }
 //prevent context menu when long touch
