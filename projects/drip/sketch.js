@@ -4,10 +4,12 @@ let dripQueue = [] //queue storing drips
 const gravity = 0.00098 //gravity const for the drips
 let mouseCurrentDrip //current droplet generate by clicking
 let dripGrowing = false
-
+let canvas
 function setup () {
   //init canvas variables in setup
-  createCanvas(windowWidth, windowHeight);
+  canvas = createCanvas(windowWidth, windowHeight);
+  canvas.position(0, 0)
+  canvas.style('z-index', '-1')
   noFill()
   stroke(255)
 }

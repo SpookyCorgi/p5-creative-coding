@@ -6,9 +6,11 @@ let shapeQueue = []
 const shapePerCircle = 200
 const shapeInterval = 20
 let graphic
-
+let canvas
 function setup () {
-    createCanvas(windowWidth, windowHeight)
+    canvas = createCanvas(windowWidth, windowHeight)
+    canvas.position(0, 0)
+    canvas.style('z-index', '-1')
     background(0)
     stroke(255)
     rectMode(CENTER)

@@ -31,9 +31,11 @@ function init () {
     size *= 1.015;
   }
 }
-
+let canvas
 function setup () {
-  createCanvas(windowWidth, windowHeight, WEBGL);
+  canvas = createCanvas(windowWidth, windowHeight, WEBGL);
+  canvas.position(0, 0)
+  canvas.style('z-index', '-1')
   init();
   //checkbox = createCheckbox('Animation', false);
   //checkbox.changed(animationChange);

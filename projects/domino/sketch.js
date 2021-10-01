@@ -6,9 +6,11 @@ let xAmount = 0
 let yAmount = 0
 let fallAmount = 0
 let allFall = false
-
+let canvas
 function setup () {
-    createCanvas(windowWidth, windowHeight)
+    canvas = createCanvas(windowWidth, windowHeight)
+    canvas.position(0, 0)
+    canvas.style('z-index', '-1')
     background(255)
     fill(0)
     rectMode(CENTER)
