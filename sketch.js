@@ -1,17 +1,13 @@
 let canvas
 function setup () {
-    canvas = createCanvas(windowWidth, windowHeight, WEBGL);
+    canvas = createCanvas(windowWidth * 2, windowHeight * 2, WEBGL);
     noLoop()
     noFill()
     stroke("#ccffff66")
     strokeWeight(1)
     rectMode(CENTER)
-    canvas.position(0, 0)
+    canvas.position(-windowWidth / 2, -windowHeight / 2)
     canvas.style('z-index', '-1')
-}
-
-function windowResized () {
-    resizeCanvas(windowWidth, windowHeight)//resize canvas when window is resized
 }
 
 let count = 5
