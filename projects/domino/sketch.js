@@ -42,9 +42,9 @@ function mouseClicked () {
 function init () {
     //responsive padding and amount of dominos
     paddingLeft = windowWidth % gridSize / 2
-    paddingTop = windowHeight % gridSize / 2
+    paddingTop = windowHeight % gridSize / 2 + gridSize
     xAmount = int(windowWidth / gridSize)
-    yAmount = int(windowHeight / gridSize)
+    yAmount = int(windowHeight / gridSize) - 1
     //setup up dominos for every window resize
     dominos = new Array(xAmount)
     for (let i = 0; i < xAmount; i++) {

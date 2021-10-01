@@ -5,7 +5,6 @@ html, body, main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: black;
   width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -22,7 +21,6 @@ html, body, main {
   padding: 0;
   display: flex;
   flex-direction: column;
-  background-color: black;
   width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -39,7 +37,7 @@ user-select: none; /* Standard */
 }
 
 h1{
-  font-size: 48px;
+  font-size: 64px;
 }
 
 h2{
@@ -54,18 +52,22 @@ a{
   text-decoration: none;
 }
 
-.neon{
+.neon-shadow{
   text-shadow: 
   0 0 20px #ccffff;
 }
 
-.dark{
+.black-shadow{
   text-shadow: 
   0 0 20px #000000;
 }
 
-.colored{
+.neon{
   color: #ccffff;
+}
+
+.black{
+  color: #000000;
 }
 
 .project-item{
@@ -88,6 +90,7 @@ a{
   flex-direction: row;
   flex-wrap: wrap;
   justify-items: flex-start;
+  padding-top: 20px;
 }
 
 .title{
@@ -108,4 +111,31 @@ a{
   .content{
     width: 960px;
   }
+}
+
+.tips{
+  position: absolute;
+  top:10px;
+}
+
+footer{
+  width:100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: center;
+  background-color: #000000bb;
+}
+
+hr{
+  flex-grow:1;
+  margin-left: 20px;
+  margin-right:20px;
+  color:#ccffff;
+  opacity:50%;
+  margin-top: 0;
+}
+
+canvas {
+  position: fixed !important;
 }

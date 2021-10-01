@@ -18,37 +18,47 @@
   <!--jquery-->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"
     integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+      <!--p5.js-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
+
 </head>
 
 <body>
   <div class="content">
+    <script src="sketch.js"></script>
     <div class="title">
-      <h1 class="animate__animated animate__lightSpeedInLeft colored">Helloooooo there!</h1>
-      <h3 class="animate__animated animate__lightSpeedInLeft animate__delay-1s colored">Welcome to my Creative Coding
+      <h1 class="animate__animated animate__lightSpeedInLeft neon">Helloooooo there!</h1>
+      <h3 >Welcome to my Creative Coding
         project
         page</h3>
-      <h3 class="animate__animated animate__lightSpeedInLeft animate__delay-2s colored">Here is the list of them!</h3>
+      <h3 >Here is the list of them!</h3>
     </div>
 
-    <div id="projects" class="projects animate__animated animate__lightSpeedInLeft animate__delay-4s">
-      <a class="project-item neon" href="./projects/spiral/index.html">S P I R A L        <img src="assets/spiral_thumb.png" alt="This is a thumbnail"></a>
-      <a class="project-item neon" href="./projects/drip/index.html">D R I P
+    <div id="projects" class="projects">
+      <a class="project-item neon-shadow" href="./projects/spiral/index.html">S P I R A L        <img src="assets/spiral_thumb.png" alt="This is a thumbnail"></a>
+      <a class="project-item neon-shadow" href="./projects/drip/index.html">D R I P
         <img src="assets/drip_thumb.png" alt="This is a thumbnail"></a>
-      <a class="project-item neon" href="./projects/mandala/index.html">M A N D A L A
+      <a class="project-item neon-shadow" href="./projects/mandala/index.html">M A N D A L A
         <img src="assets/mandala_thumb.png" alt="This is a thumbnail"></a>
-      <a class="project-item neon" href="./projects/domino/index.html">D O M I N O
+      <a class="project-item neon-shadow" href="./projects/domino/index.html">D O M I N O
         <img src="assets/domino_thumb.png" alt="This is a thumbnail"></a>
     </div>
   </div>
 </body>
 
+<footer>
+  <hr>
+  <a href="https://chengchilee.com"><h3>More about me</h3></a>
+</footer>
+
 <script type="text/javascript">
   $(document).ready(function () {
-    window.setTimeout(scrollToProjects, 3500)
+    window.setTimeout(scrollToProjects, 2000)
     function scrollToProjects() {
       $('html, body').animate({
         scrollTop: $('#projects').offset().top
-      }, 500)
+      }, 1000)
     }
 
   });</script>
