@@ -1,7 +1,7 @@
 //do not support multiline
 //do not support x2, y2 aka boundaries
 class AniText {
-    constructor(str, x1, y1, animation, length = 1000) {
+    constructor(str, x1, y1, color, animation, autostart = true, length = 1000) {
         this.animation = animation
         this.length = length
         this.str = str
@@ -11,7 +11,10 @@ class AniText {
         this.textHeight = this.getTextHeight(this.str)
         this.animationFinished = true
         this.startTime = 0
-        this.start()
+        this.color = color
+        if (autostart) {
+            this.start()
+        }
     }
 
     start () {
@@ -25,9 +28,9 @@ class AniText {
         }
 
         if (!this.animationFinished) {
-            let delta = (millis() - this.startTime) / 1000
+            let delta = (millis() - this.startTime) / this.length
             switch (this.animation) {
-                //for slide in animations, the offset will be the width or height of the string
+                //for slide in/out animations, the offset will be the width or height of the string
                 case "slideInLeft":
                     text(this.str,
                         this.textWidth * (1 - (1 - delta) * (1 - delta)) + (this.x1 - this.textWidth),
@@ -48,11 +51,92 @@ class AniText {
                         this.x1,
                         -this.textHeight * (1 - (1 - delta) * (1 - delta)) + (this.y1 + this.textHeight))
                     break;
+                case "slideOutLeft":
+                    text(this.str,
+                        -this.textWidth * (1 - (1 - delta) * (1 - delta)) + this.x1,
+                        this.y1)
+                    break;
+                case "slideOutRight":
+                    text(this.str,
+                        this.textWidth * (1 - (1 - delta) * (1 - delta)) + this.x1,
+                        this.y1)
+                    break;
+                case "slideOutUp":
+                    text(this.str,
+                        this.x1,
+                        -this.textHeight * (1 - (1 - delta) * (1 - delta)) + this.y1)
+                    break;
+                case "slideOutDown":
+                    text(this.str,
+                        this.x1,
+                        this.textHeight * (1 - (1 - delta) * (1 - delta)) + this.y1)
+                    break;
+                case "zoomIn":
+                    push()
+                    translate(this.x1 + this.textWidth / 2, this.y1 - this.textHeight / 2)
+                    scale(1 - (1 - delta) * (1 - delta))
+                    translate(-this.textWidth / 2, this.textHeight / 2)
+                    this.color.setAlpha(255 * (1 - (1 - delta) * (1 - delta)))
+                    fill(this.color)
+                    text(this.str, 0, 0)
+                    pop()
+                    break;
+                case "zoomOut":
+                    push()
+                    translate(this.x1 + this.textWidth / 2, this.y1 - this.textHeight / 2)
+                    scale((1 - delta) * (1 - delta))
+                    translate(-this.textWidth / 2, this.textHeight / 2)
+                    this.color.setAlpha(255 * ((1 - delta) * (1 - delta)))
+                    fill(this.color)
+                    text(this.str, 0, 0)
+                    pop()
+                    break;
+                case "rotateIn":
+                    push()
+                    translate(this.x1 + this.textWidth / 2, this.y1 - this.textHeight / 2)
+                    rotate(PI + PI * (1 - (1 - delta) * (1 - delta)))
+                    translate(-this.textWidth / 2, this.textHeight / 2)
+                    this.color.setAlpha(255 * (1 - (1 - delta) * (1 - delta)))
+                    fill(this.color)
+                    text(this.str, 0, 0)
+                    pop()
+                    break;
+                case "rotateOut":
+                    push()
+                    translate(this.x1 + this.textWidth / 2, this.y1 - this.textHeight / 2)
+                    rotate(PI + PI * ((1 - delta) * (1 - delta)))
+                    translate(-this.textWidth / 2, this.textHeight / 2)
+                    this.color.setAlpha(255 * ((1 - delta) * (1 - delta)))
+                    fill(this.color)
+                    text(this.str, 0, 0)
+                    pop()
+                    break;
             }
         } else {
-            text(this.str,
-                this.x1,
-                this.y1)
+            switch (this.animation) {
+                case "slideOutLeft":
+
+                    break;
+                case "slideOutRight":
+
+                    break;
+                case "slideOutUp":
+
+                    break;
+                case "slideOutDown":
+
+                    break;
+                case "zoomOut":
+                    break;
+                case "rotateOut":
+                    break;
+                default:
+                    text(this.str,
+                        this.x1,
+                        this.y1)
+                    break;
+            }
+
         }
     }
 

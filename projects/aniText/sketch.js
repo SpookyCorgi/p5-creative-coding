@@ -3,7 +3,7 @@ let t
 let str
 let canvas
 let button
-let selectList = ['slideInLeft', 'slideInRight', 'slideInUp', 'slideInDown']
+let selectList = ['slideInLeft', 'slideInRight', 'slideInUp', 'slideInDown', 'slideOutLeft', 'slideOutRight', "slideOutUp", 'slideOutDown', 'zoomIn', 'zoomOut', 'rotateIn', 'rotateOut']
 function setup () {
     canvas = createCanvas(windowWidth, windowHeight)
     canvas.position(0, 0)
@@ -27,7 +27,7 @@ function setup () {
 
 function changeAnimation () {
     let item = sel.value();
-    t = new AniText(item, windowWidth / 2 - textWidth(item) / 2, windowHeight / 2 - 50, item)
+    t = new AniText(item, windowWidth / 2 - textWidth(item) / 2, windowHeight / 2, color(0), item, true, 1000)
 }
 
 function replayAnimation () {
