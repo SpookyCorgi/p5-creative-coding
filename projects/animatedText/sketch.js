@@ -27,7 +27,7 @@ function setup () {
 
 function changeAnimation () {
     let item = sel.value();
-    t = new AniText(item, windowWidth / 2 - textWidth(item) / 2, windowHeight / 2, color(0), item, true, 1000)
+    t = new AnimatedText(item, windowWidth / 2 - textWidth(item) / 2, windowHeight / 2, color(0), item)
 }
 
 function replayAnimation () {
