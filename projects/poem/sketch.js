@@ -1,9 +1,10 @@
 let subjects = ['HUMAN', 'RABBITS', 'FOXES']
-let animations = ['slideOutDown', 'slideOutUp', 'zoomOut']
+let animations = ['slideOutDown', 'slideOutUp', 'zoomOut', 'rotateOut']
 let actions = {
     'slideOutDown': 'FALL OUT OF THE WORLD',
     'slideOutUp': 'JUMP THROUGH THE SKY',
     'zoomOut': 'COLLAPSE INTO A VOID',
+    'rotateOut': 'GOT EATEN BY A TOILET'
 }
 let textHeight = 20
 
@@ -39,6 +40,12 @@ function windowResized () {
 let count = 0
 let max = 3
 let delta = 2000
+function mousePressed () {
+    firstTextQueue = []
+    secondTextQueue = []
+    count = 0
+    newLine()
+}
 
 function newLine () {
     count++
