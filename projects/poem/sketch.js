@@ -41,10 +41,12 @@ let count = 0
 let max = 3
 let delta = 2000
 function mousePressed () {
-    firstTextQueue = []
-    secondTextQueue = []
-    count = 0
-    newLine()
+    if (count >= 3) {
+        firstTextQueue = []
+        secondTextQueue = []
+        count = 0
+        newLine()
+    }
 }
 
 function newLine () {
@@ -59,13 +61,13 @@ function newLine () {
     }
     oldAnimation = animation;
 
-    animatedText = new AnimatedText(subject, width / 6 + 220, 200 * count, color(255), animation, delta)
+    animatedText = new AnimatedText(subject, width / 6 + 220, 180 * count, color(255), animation, delta)
     if (windowWidth < 960) {
-        animatedText = new AnimatedText(subject, width / 6 + 110, 200 * count, color(255), animation, delta)
+        animatedText = new AnimatedText(subject, width / 6 + 110, 180 * count, color(255), animation, delta)
     }
 
-    firstTextQueue.push(({ str: "A GROUP OF ", x1: width / 6, y1: 200 * count }))
-    secondTextQueue.push(({ str: actions[animation], x1: width / 6, y1: 200 * count + 50 }))
+    firstTextQueue.push(({ str: "A GROUP OF ", x1: width / 6, y1: 180 * count }))
+    secondTextQueue.push(({ str: actions[animation], x1: width / 6, y1: 180 * count + 50 }))
 
     if (count < 3) {
         setTimeout(newLine, delta)
