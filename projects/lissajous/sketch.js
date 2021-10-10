@@ -13,6 +13,7 @@ let add = 0
 p5.disableFriendlyErrors = true;
 let _text
 let canvas
+let restartTime = 0
 function setup () {
   canvas = createCanvas(windowWidth, windowHeight, WEBGL);
   canvas.position(0, 0)
@@ -26,14 +27,10 @@ function setup () {
   stroke(255)
   noFill()
 
-  deltaN = map(random(), 0, 1, 5, 10)
-  deltaM = map(random(), 0, 1, 5, 10)
-
   _text = createGraphics(40, 40)
   _text.fill(255)
-  _text.background(0)
-  _text.text("N: " + int((10 / deltaN) * 100) / 100, 0, 10)
-  _text.text("M: " + int((10 / deltaM) * 100) / 100, 0, 30)
+
+  init()
 }
 
 function windowResized () {
@@ -41,13 +38,11 @@ function windowResized () {
 }
 
 function init () {
-  deltaN = map(random(), 0, 1, 5, 10)
-  deltaM = map(random(), 0, 1, 5, 10)
-  n = 0
-  m = 0
-  _text.background(0)
-  _text.text("N: " + int((10 / deltaN) * 100) / 100, 0, 10)
-  _text.text("M: " + int((10 / deltaM) * 100) / 100, 0, 30)
+  deltaN = int(map(random(), 0, 1, 1, 10))
+  deltaM = int(map(random(), 0, 1, 1, 10))
+  n = deltaN
+  m = deltaM
+  restartTime = millis()
 }
 
 function mouseClicked () {
@@ -77,10 +72,17 @@ function draw () {
     pop()
   }
 
-  //delta2 = millis() / 10
-  n = millis() / 1000 / deltaN
-  m = millis() / 1000 / deltaM
 
+  let now = (millis() - restartTime)
+  if (now > 15000) {
+    init()
+  }
 
+  delta1 = now / 20
+  delta2 = now / 10
+
+  _text.background(0)
+  _text.text("N: " + int(n * 100) / 100, 0, 10)
+  _text.text("M: " + int(m * 100) / 100, 0, 30)
   image(_text, windowWidth / 2 - 60, -windowHeight / 2 + 40)
 }
