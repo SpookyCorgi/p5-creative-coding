@@ -116,6 +116,10 @@ a{
 .tips{
   position: absolute;
   top:10px;
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 40%;
+  text-align: center;
 }
 
 footer{
