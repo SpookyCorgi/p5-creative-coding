@@ -63,11 +63,12 @@
   $(document).ready(function () {
     window.setTimeout(scrollToProjects, 2000)
     function scrollToProjects() {
-      $('html, body').animate({
+      if($(document).scrollTop()<$('#projects').offset().top){
+        $('html, body').animate({
         scrollTop: $('#projects').offset().top
-      }, 1000)
+        }, 1000)
+      }
     }
-
   });</script>
 
 </html>
