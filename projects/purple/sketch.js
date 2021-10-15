@@ -40,18 +40,18 @@ function mouseClicked () {
 
 function draw () {
     background(0);
-    image(img, width / 2 - w / 2, 40, w, height / 2)
+    image(img, width / 2 - w / 2, 80, w, height / 2)
 
     fill(color(r, g, b))
     noStroke()
-    rect(width / 2 - w / 2, height / 2 + 60, w / 4, w / 4)
+    rect(width / 2 - w / 2, height / 2 + 100, w / 4, w / 4)
 
     fill(255)
-    text('R: ' + r, width / 2 - w / 2 + w / 4 + 20, height / 2 + 80)
-    text('G: ' + g, width / 2 - w / 2 + w / 4 + 20, height / 2 + 110)
-    text('B: ' + b, width / 2 - w / 2 + w / 4 + 20, height / 2 + 140)
-    text('Hex: ' + "#" + hex(r, 2) + hex(g, 2) + hex(b, 2), width / 2 - w / 2 + w / 4 + 20, height / 2 + 170)
-    text('Point: x:' + x + " y:" + y, width / 2 - w / 2 + w / 4 + 20, height / 2 + 200)
+    text('R: ' + r, width / 2 - w / 2 + w / 4 + 20, height / 2 + 120)
+    text('G: ' + g, width / 2 - w / 2 + w / 4 + 20, height / 2 + 150)
+    text('B: ' + b, width / 2 - w / 2 + w / 4 + 20, height / 2 + 180)
+    text('Hex: ' + "#" + hex(r, 2) + hex(g, 2) + hex(b, 2), width / 2 - w / 2 + w / 4 + 20, height / 2 + 210)
+    text('Point: x:' + x + " y:" + y, width / 2 - w / 2 + w / 4 + 20, height / 2 + 240)
 
     stroke(color(255, 0, 0))
     noFill()
