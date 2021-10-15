@@ -26,13 +26,16 @@ function preload () {
 }
 
 function mouseClicked () {
+    let d = pixelDensity()
+    console.log(d)
     loadPixels()
     x = mouseX
     y = mouseY
-    let p = (mouseY * width + mouseX) * 4
+    let p = (mouseY * d * width * d + mouseX * d) * 4
     r = pixels[p]
     g = pixels[p + 1]
     b = pixels[p + 2]
+    updatePixels()
 }
 
 function draw () {
