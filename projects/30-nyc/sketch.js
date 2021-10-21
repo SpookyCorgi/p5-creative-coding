@@ -10,18 +10,12 @@ let scaling = 1
 let t = 0
 let now = 0
 let then = 0
-
-let _text
 function setup () {
     canvas = createCanvas(windowWidth, windowHeight, WEBGL)
     canvas.position(0, 0)
     canvas.style('z-index', '-1')
-    pixelDensity(1);
     camera(0, 250, 500, 0, 0, 0)
     customScale()
-
-    _text = createGraphics(80, 80)
-    _text.fill(255)
 }
 
 function windowResized () {
@@ -93,14 +87,5 @@ function draw () {
     }
     texture[t].updatePixels()
 
-    //draw a date
-    _text.clear()
-    _text.fill(0)
-    _text.textSize(64)
-    if (int(t / 12) < 10) {
-        _text.text(int(t / 12), 20, 80)
-    } else {
-        _text.text(int(t / 12), 0, 80)
-    }
-    image(_text, -40, -windowHeight / 2 + 20 * scaling)
+    $('#day').text(int(t / 12))
 }
