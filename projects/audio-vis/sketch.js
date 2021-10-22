@@ -10,7 +10,7 @@ function preload () {
     song = loadSound('2.35am.wav')
 
     myShader = loadShader("shader.vert", "shader.frag");
-    matcap = loadImage("7877EE_D87FC5_75D9C7_1C78C0.png");
+    matcap = loadImage("422509_C89536_824512_0A0604.png");
 }
 
 function setup () {
