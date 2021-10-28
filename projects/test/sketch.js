@@ -103,7 +103,7 @@ function draw () {
                 //checkboxes[j * hAmount + i].checked(true)
             }
             push()
-            translate(hPadding + i * gridSize + gridSize / 2 - windowWidth / 2,
+            translate(hPadding + (hAmount - i) * gridSize + gridSize / 2 - windowWidth / 2,
                 paddingTop + vPadding + j * gridSize + gridSize / 2 - windowHeight / 2)
             rotateX((255 - brightness) / 255 * PI)
             //scale((255 - brightness) / 255)
