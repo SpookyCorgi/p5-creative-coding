@@ -19,15 +19,8 @@ let captureHeight
 
 let div
 
-let myShader
-let matcap
-function preload () {
-    myShader = loadShader("shader.vert", "shader.frag");
-    matcap = loadImage("422509_C89536_824512_0A0604.png");
-}
-
 function setup () {
-    canvas = createCanvas(windowWidth, windowHeight, WEBGL)
+    canvas = createCanvas(windowWidth, windowHeight)
     canvas.position(0, 0)
     canvas.style('z-index', '-1')
 
@@ -41,10 +34,10 @@ function setup () {
     capture.hide()
     scaling()
     noStroke()
-    rectMode(CENTER)
 }
 
 function createCheckboxes () {
+    //clean up check boxes
     div.remove()
     div = createDiv('');
     checkboxes = []
@@ -53,13 +46,13 @@ function createCheckboxes () {
     vAmount = int((windowHeight - paddingTop) / gridSize)
     hPadding = windowWidth % gridSize / 2
     vPadding = (windowHeight - paddingTop) % gridSize / 2
-    /*for (let j = 0; j < vAmount; j++) {
+    for (let j = 0; j < vAmount; j++) {
         for (let i = 0; i < hAmount; i++) {
             let checkbox = createCheckbox('', true).parent(div)
             checkbox.position(hPadding + i * gridSize, paddingTop + vPadding + j * gridSize);
             checkboxes.push(checkbox)
         }
-    }*/
+    }
 }
 function windowResized () {
     resizeCanvas(windowWidth, windowHeight)
@@ -67,6 +60,7 @@ function windowResized () {
 }
 
 function scaling () {
+    //auto scale and clip capture to the screensize
     let canvasRatio = windowWidth / (windowHeight - paddingTop)
     let captureRatio = capture.width / capture.height
 
@@ -84,8 +78,6 @@ function scaling () {
 }
 
 function draw () {
-    shader(myShader)
-    myShader.setUniform("uMatcapTexture", matcap)
     background(0)
     scaling()
     capture.loadPixels()
@@ -98,19 +90,10 @@ function draw () {
             b = capture.pixels[p + 2]
             let brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b
             if (brightness > brightnessThreshold) {
-                //checkboxes[j * hAmount + i].checked(false)
+                checkboxes[j * hAmount + i].checked(false)
             } else {
-                //checkboxes[j * hAmount + i].checked(true)
+                checkboxes[j * hAmount + i].checked(true)
             }
-            push()
-            translate(hPadding + (hAmount - i) * gridSize + gridSize / 2 - windowWidth / 2,
-                paddingTop + vPadding + j * gridSize + gridSize / 2 - windowHeight / 2)
-            rotateX((255 - brightness) / 255 * PI)
-            //scale((255 - brightness) / 255)
-            //fill(0)
-            //rect(0, 0, gridSize, gridSize)
-            torus(6, 5)
-            pop()
         }
     }
     capture.updatePixels()
