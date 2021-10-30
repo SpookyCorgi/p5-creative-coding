@@ -22,8 +22,12 @@ let then = 0
 
 let state = 'play'
 
-let osc
-let colBrightness = 0
+let sinOsc
+let triOsc
+let sqrOsc
+let colR = 0
+let colG = 0
+let colB = 0
 
 function setup () {
     canvas = createCanvas(windowWidth, windowHeight)
@@ -45,10 +49,15 @@ function setup () {
     //slider
     slider = createSlider(10, 100, 20);
     slider.position(windowWidth / 2 - 80, 30);
-    slider.style('width', '160px');
+    slider.style('width', '160px')
 
-    osc = new p5.Oscillator('sine');
-    osc.start();
+    sinOsc = new p5.Oscillator('sine')
+    triOsc = new p5.Oscillator('triangle')
+    sqrOsc = new p5.Oscillator('square')
+
+    sinOsc.start()
+    triOsc.start()
+    sqrOsc.start()
 }
 
 function sizing () {
@@ -86,10 +95,14 @@ function mouseClicked () {
     if (mouseY > paddingTop) {
         if (state == 'play') {
             state = 'pause'
-            osc.stop()
+            sinOsc.stop()
+            triOsc.stop()
+            sqrOsc.stop()
         } else {
             state = 'play'
-            osc.start()
+            sinOsc.start()
+            triOsc.start()
+            sqrOsc.start()
         }
     }
 }
@@ -100,7 +113,9 @@ function draw () {
     scaling()
 
     background(0)
-    colBrightness = 0
+    colR = 0
+    colG = 0
+    colB = 0
     capture.loadPixels()
     for (let j = 0; j < vAmount; j++) {
         for (let i = 0; i < hAmount; i++) {
@@ -117,11 +132,16 @@ function draw () {
             pop()
 
             if (i == step) {
-                colBrightness += brightness
+                colR += r
+                colG += g
+                colB += b
             }
         }
     }
-    colBrightness = colBrightness / vAmount
+    colR = colR / vAmount
+    colG = colG / vAmount
+    colB = colB / vAmount
+
     capture.updatePixels()
     let c = color(0, 255, 0)
     c.setAlpha(128)
@@ -139,5 +159,10 @@ function draw () {
         step = 0
     }
 
-    osc.freq(pow(colBrightness, 1.6), 0.1);
+    sinOsc.freq(pow(colR, 1.4), 0.1);
+    triOsc.freq(pow(colG, 1.4), 0.1);
+    sqrOsc.freq(pow(colB, 1.4), 0.1);
+    sinOsc.amp(0.3, 0.1)
+    triOsc.amp(0.3, 0.1)
+    sqrOsc.amp(0.3, 0.1)
 }
