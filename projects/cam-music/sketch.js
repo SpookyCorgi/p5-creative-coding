@@ -13,11 +13,11 @@ let captureScale = 1
 let captureWidth
 let captureHeight
 
-let round = 0
-let side = 0
-let noteAtSide = 0
-let playX = 0
-let playY = 0
+let step
+let matrix = []
+let noteX = 0
+let noteY = 0
+let direction = 0
 
 let now = 0
 let then = 0
@@ -119,10 +119,18 @@ function mouseClicked () {
 
 function gridAmountInputChange () {
     gridAmount = this.value()
+    matrix = new Array(gridAmount * gridAmount).fill(0)
+    noteX = 0
+    noteY = 0
+    direction = 0
 }
 
 function soundAmountInputChange () {
     soundAmount = this.value()
+}
+
+function nextNote (round, side, noteAtSide) {
+
 }
 
 function draw () {
@@ -181,29 +189,62 @@ function draw () {
     colB = colB / amount
 
     capture.updatePixels()
-    let c = color(0, 255, 0)
+
+
+    let c = color(255, 255, 255)
     c.setAlpha(128)
     fill(c)
-    rect(hPadding + gridSize / 2 + gridSize * step, vPadding + paddingTop + gridSize * amount / 2, gridSize, gridSize * amount)
+    noStroke
+    rect(hPadding + noteX * gridSize * soundAmount + gridSize * soundAmount / 2, paddingTop + vPadding + noteY * gridSize * soundAmount + gridSize * soundAmount / 2, gridSize * soundAmount)
+
 
     now = millis()
     if (state == 'play') {
-        if (now - then > 100) {
+        if (now - then > 500) {
             then = millis()
-            switch (side) {
+
+            if (noteX == int((gridAmount - 1) / 2) && noteY == int(gridAmount / 2)) {
+                noteX = -1
+                noteY = 0
+                direction = 0
+                matrix = new Array(gridAmount * gridAmount).fill(0)
+            }
+            matrix[noteX + noteY * gridAmount] = 1
+            switch (direction) {
                 case 0:
-                    x++
+                    noteX++
+                    if (noteX == gridAmount || matrix[noteX + noteY * gridAmount]) {
+                        noteX--
+                        noteY++
+                        direction = 1
+                    }
+                    break
                 case 1:
-                    y++
+                    noteY++
+                    if (noteY == gridAmount || matrix[noteX + noteY * gridAmount]) {
+                        noteY--
+                        noteX--
+                        direction = 2
+                    }
+                    break
                 case 2:
-                    x--
+                    noteX--
+                    if (noteX == -1 || matrix[noteX + noteY * gridAmount]) {
+                        noteX++
+                        noteY--
+                        direction = 3
+                    }
+                    break
                 case 3:
-                    y--
+                    noteY--
+                    if (noteY == -1 || matrix[noteX + noteY * gridAmount]) {
+                        noteY++
+                        noteX++
+                        direction = 0
+                    }
+                    break
             }
         }
-    }
-    if (step >= amount) {
-        step = 0
     }
 
     sinOsc.freq(pow(colR, 1.4), 0.1);
