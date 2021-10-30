@@ -1,11 +1,10 @@
 let canvas
 
-let hAmount
-let vAmount
+let amount
 let hPadding
 let vPadding
-let paddingTop = 60
-let gridSize = 40
+let paddingTop = 120
+let gridSize
 
 let capture
 let captureStartX = 0
@@ -14,9 +13,12 @@ let captureScale = 1
 let captureWidth
 let captureHeight
 
-let slider
+let round = 0
+let side = 0
+let noteAtSide = 0
+let playX = 0
+let playY = 0
 
-let step = 0
 let now = 0
 let then = 0
 
@@ -28,6 +30,13 @@ let sqrOsc
 let colR = 0
 let colG = 0
 let colB = 0
+
+let gridAmountInput
+let soundAmountInput
+
+//assume each note is a eighth note, with 120 bpm, 16 notes will 2 bars, 8 second
+let gridAmount = 4
+let soundAmount = 2
 
 function setup () {
     canvas = createCanvas(windowWidth, windowHeight)
@@ -45,11 +54,14 @@ function setup () {
     noStroke()
     rectMode(CENTER)
 
-
-    //slider
-    slider = createSlider(10, 100, 20);
-    slider.position(windowWidth / 2 - 80, 30);
-    slider.style('width', '160px')
+    gridAmountInput = createInput(gridAmount)
+    gridAmountInput.position(windowWidth / 2 + 40, 80)
+    gridAmountInput.size(40)
+    gridAmountInput.input(gridAmountInputChange)
+    soundAmountInput = createInput(soundAmount)
+    soundAmountInput.position(windowWidth / 2 + 40, 110)
+    soundAmountInput.size(40)
+    soundAmountInput.input(soundAmountInputChange)
 
     sinOsc = new p5.Oscillator('sine')
     triOsc = new p5.Oscillator('triangle')
@@ -62,32 +74,30 @@ function setup () {
 
 function sizing () {
     //checkboxes
-    hAmount = Math.floor(windowWidth / gridSize)
-    vAmount = Math.floor((windowHeight - paddingTop) / gridSize)
-    hPadding = (windowWidth - gridSize * hAmount) / 2
-    vPadding = (windowHeight - paddingTop - gridSize * vAmount) / 2
+    amount = gridAmount * soundAmount
+    if (windowWidth > windowHeight) {
+        gridSize = int((windowHeight - paddingTop) / amount)
+    } else {
+        gridSize = int(windowWidth / amount)
+    }
+    hPadding = (windowWidth - gridSize * amount) / 2
+    vPadding = (windowHeight - paddingTop - gridSize * amount) / 2
 }
 
 function windowResized () {
     resizeCanvas(windowWidth, windowHeight)
-    sizing()
 }
 
 function scaling () {
     //auto scale and clip capture to the screensize
-    let canvasRatio = windowWidth / (windowHeight - paddingTop)
     let captureRatio = capture.width / capture.height
 
-    if (canvasRatio >= captureRatio) {
-        captureWidth = capture.width
-        captureHeight = capture.width / canvasRatio
-        captureStartY = int((capture.height - captureHeight) / 2)
-        captureScale = int(capture.width / hAmount)
+    if (captureRatio < 1) {
+        captureStartY = int((capture.height - capture.width) / 2)
+        captureScale = int(capture.width / amount)
     } else {
-        captureHeight = capture.height
-        captureWidth = capture.height * canvasRatio
-        captureStartX = int((capture.width - captureWidth) / 2)
-        captureScale = int(capture.height / vAmount)
+        captureStartX = int((capture.width - capture.height) / 2)
+        captureScale = int(capture.height / amount)
     }
 }
 
@@ -107,18 +117,31 @@ function mouseClicked () {
     }
 }
 
+function gridAmountInputChange () {
+    gridAmount = this.value()
+}
+
+function soundAmountInputChange () {
+    soundAmount = this.value()
+}
+
 function draw () {
-    gridSize = slider.value()
     sizing()
     scaling()
 
     background(0)
+
+    textSize(24)
+    fill(255)
+    text('Note per side: ', windowWidth / 2 - 120, 100)
+    text('Sound per note: ', windowWidth / 2 - 142, 130)
+
     colR = 0
     colG = 0
     colB = 0
     capture.loadPixels()
-    for (let j = 0; j < vAmount; j++) {
-        for (let i = 0; i < hAmount; i++) {
+    for (let j = 0; j < amount; j++) {
+        for (let i = 0; i < amount; i++) {
             let start = (captureStartY * capture.width + captureStartX) * 4
             let p = start + (j * capture.width * captureScale + i * captureScale) * 4
             r = capture.pixels[p]
@@ -129,6 +152,7 @@ function draw () {
             translate(hPadding + i * gridSize + gridSize / 2, paddingTop + vPadding + j * gridSize + gridSize / 2)
             fill(r, g, b)
             rect(0, 0, gridSize, gridSize)
+
             pop()
 
             if (i == step) {
@@ -138,24 +162,47 @@ function draw () {
             }
         }
     }
-    colR = colR / vAmount
-    colG = colG / vAmount
-    colB = colB / vAmount
+
+    for (let i = 0; i < gridAmount; i++) {
+        for (let j = 0; j < gridAmount; j++) {
+            push()
+            translate(hPadding + i * gridSize * soundAmount + gridSize * soundAmount / 2, paddingTop + vPadding + j * gridSize * soundAmount + gridSize * soundAmount / 2)
+
+            noFill()
+            stroke(color(0))
+            strokeWeight(5)
+            rect(0, 0, gridSize * soundAmount, gridSize * soundAmount)
+
+            pop()
+        }
+    }
+    colR = colR / amount
+    colG = colG / amount
+    colB = colB / amount
 
     capture.updatePixels()
     let c = color(0, 255, 0)
     c.setAlpha(128)
     fill(c)
-    rect(hPadding + gridSize / 2 + gridSize * step, vPadding + paddingTop + gridSize * vAmount / 2, gridSize, gridSize * vAmount)
+    rect(hPadding + gridSize / 2 + gridSize * step, vPadding + paddingTop + gridSize * amount / 2, gridSize, gridSize * amount)
 
     now = millis()
     if (state == 'play') {
         if (now - then > 100) {
             then = millis()
-            step++
+            switch (side) {
+                case 0:
+                    x++
+                case 1:
+                    y++
+                case 2:
+                    x--
+                case 3:
+                    y--
+            }
         }
     }
-    if (step >= hAmount) {
+    if (step >= amount) {
         step = 0
     }
 
