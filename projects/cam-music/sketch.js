@@ -15,10 +15,11 @@ let captureScale = 1
 let captureWidth
 let captureHeight
 //note playing
-let matrix = []
+let gridMatrix = []
 let noteX = 0
 let noteY = 0
 let direction = 0
+let smallGridMatrix = []
 //time
 let now = 0
 let then = 0
@@ -75,6 +76,9 @@ function setup () {
     //sinOsc.start()
     //triOsc.start()
     //sqrOsc.start()
+
+    gridMatrix = new Array(gridAmount * gridAmount).fill(0)
+    smallGridMatrix = new Array(gridAmount * noteAmount * gridAmount * noteAmount).fill({ r: 0, g: 0, b: 0 })
 }
 
 function sizing () {
@@ -140,13 +144,16 @@ function noteAmountInputChange () {
 }
 
 function restartLoop () {
-    matrix = new Array(gridAmount * gridAmount).fill(0)
+    gridMatrix = new Array(gridAmount * gridAmount).fill(0)
     noteX = -1
     noteY = 0
     direction = 0
+
+    smallGridMatrix = new Array(gridAmount * noteAmount * gridAmount * noteAmount).fill({ r: 0, g: 0, b: 0 })
 }
 
 function draw () {
+    console.log(smallGridMatrix)
     sizing()
     scaling()
 
@@ -183,6 +190,10 @@ function draw () {
             fill(r, g, b)
             rect(0, 0, smallGridSize * 19 / 20)
             pop()
+
+            smallGridMatrix[smallGridAmount * j + i].r = r
+            smallGridMatrix[smallGridAmount * j + i].g = g
+            smallGridMatrix[smallGridAmount * j + i].b = b
         }
     }
     capture.updatePixels()
@@ -221,12 +232,12 @@ function draw () {
                 restartLoop()
             }
             //set traversed grid as true
-            matrix[noteX + noteY * gridAmount] = 1
+            gridMatrix[noteX + noteY * gridAmount] = 1
             //change directions
             switch (direction) {
                 case 0:
                     noteX++
-                    if (noteX == gridAmount || matrix[noteX + noteY * gridAmount]) {
+                    if (noteX == gridAmount || gridMatrix[noteX + noteY * gridAmount]) {
                         noteX--
                         noteY++
                         direction = 1
@@ -234,7 +245,7 @@ function draw () {
                     break
                 case 1:
                     noteY++
-                    if (noteY == gridAmount || matrix[noteX + noteY * gridAmount]) {
+                    if (noteY == gridAmount || gridMatrix[noteX + noteY * gridAmount]) {
                         noteY--
                         noteX--
                         direction = 2
@@ -242,7 +253,7 @@ function draw () {
                     break
                 case 2:
                     noteX--
-                    if (noteX == -1 || matrix[noteX + noteY * gridAmount]) {
+                    if (noteX == -1 || gridMatrix[noteX + noteY * gridAmount]) {
                         noteX++
                         noteY--
                         direction = 3
@@ -250,7 +261,7 @@ function draw () {
                     break
                 case 3:
                     noteY--
-                    if (noteY == -1 || matrix[noteX + noteY * gridAmount]) {
+                    if (noteY == -1 || gridMatrix[noteX + noteY * gridAmount]) {
                         noteY++
                         noteX++
                         direction = 0
