@@ -9,11 +9,10 @@ let extraMarginX = 20
 let smallGridSize
 //capture
 let capture
-let captureStartX = 0
-let captureStartY = 0
-let captureScale = 1
-let captureWidth
-let captureHeight
+let img
+let mediaStartX = 0
+let mediaStartY = 0
+let mediaScale = 1
 //note playing
 let gridMatrix = []
 let noteX = 0
@@ -25,21 +24,25 @@ let now = 0
 let then = 0
 //state
 let state = 'play'
+let mode = 'capture'
 //osc
-let sinOsc
-let triOsc
-let sqrOsc
 let colR = 0
 let colG = 0
 let colB = 0
+let oscillators = []
+let oscillatorLimit = 16
 //input
 let gridAmountInput
 let soundAmountInput
+let fileInput
 let inputMargin = 0
 
 //main variables, assume each note is a eighth note, with 120 bpm, 16 notes will 2 bars, 8 second
 let gridAmount = 4
 let noteAmount = 2
+
+//bpm
+let timeInterval = 500
 
 function setup () {
     //p5 stuff
@@ -59,7 +62,8 @@ function setup () {
     soundAmountInput.position(windowWidth / 2 + 40, 60)
     soundAmountInput.size(40)
     soundAmountInput.input(noteAmountInputChange)
-
+    fileInput = createFileInput(handleFile);
+    fileInput.position(windowWidth / 2 + 40, 90);
 
     //calculate the composition of grids and their padding
     sizing()
@@ -67,18 +71,22 @@ function setup () {
     //capture and scale
     capture = createCapture(VIDEO)
     capture.hide()
-    scaling()
-
-    //create osc
-    sinOsc = new p5.Oscillator('sine')
-    triOsc = new p5.Oscillator('triangle')
-    sqrOsc = new p5.Oscillator('square')
-    //sinOsc.start()
-    //triOsc.start()
-    //sqrOsc.start()
+    scaling(capture)
 
     gridMatrix = new Array(gridAmount * gridAmount).fill(0)
-    smallGridMatrix = new Array(gridAmount * noteAmount * gridAmount * noteAmount).fill({ r: 0, g: 0, b: 0 })
+    for (let i = 0; i < gridAmount * noteAmount * gridAmount * noteAmount; i++) {
+        let obj = { r: 0, g: 0, b: 0 }
+        smallGridMatrix.push(obj)
+    }
+
+    //create oscillators
+    for (let i = 0; i < oscillatorLimit; i++) {
+        let o = new p5.Oscillator("sine");
+        o.freq(0, 0);
+        o.amp(0, 0);
+        oscillators.push(o);
+        o.start()
+    }
 }
 
 function sizing () {
@@ -100,20 +108,21 @@ function sizing () {
             inputMargin = 50
             gridAmountInput.position(windowWidth / 2 + 40, 30 + inputMargin)
             soundAmountInput.position(windowWidth / 2 + 40, 60 + inputMargin)
+            fileInput.position(windowWidth / 2 + 40, 90 + inputMargin)
             sizing()
         }
     }
 }
 
-function scaling () {
+function scaling (media) {
     //auto scale and clip capture to the screensize
-    let captureRatio = capture.width / capture.height
-    if (captureRatio < 1) {
-        captureStartY = int((capture.height - capture.width) / 2)
-        captureScale = int(capture.width / smallGridAmount)
+    let mediaRatio = media.width / media.height
+    if (mediaRatio < 1) {
+        mediaStartY = int((media.height - media.width) / 2)
+        mediaScale = int(media.width / smallGridAmount)
     } else {
-        captureStartX = int((capture.width - capture.height) / 2)
-        captureScale = int(capture.height / smallGridAmount)
+        mediaStartX = int((media.width - media.height) / 2)
+        mediaScale = int(media.height / smallGridAmount)
     }
 }
 
@@ -122,14 +131,14 @@ function mouseClicked () {
     if (mouseY > marginTop) {
         if (state == 'play') {
             state = 'pause'
-            sinOsc.stop()
-            triOsc.stop()
-            sqrOsc.stop()
+            oscillators.forEach(d => {
+                d.stop()
+            })
         } else {
             state = 'play'
-            sinOsc.start()
-            triOsc.start()
-            sqrOsc.start()
+            oscillators.forEach(d => {
+                d.start()
+            })
         }
     }
 }
@@ -137,10 +146,39 @@ function mouseClicked () {
 function gridAmountInputChange () {
     gridAmount = this.value()
     restartLoop()
+    smallGridMatrix = []
+    for (let i = 0; i < gridAmount * noteAmount * gridAmount * noteAmount; i++) {
+        let obj = { r: 0, g: 0, b: 0 }
+        smallGridMatrix.push(obj)
+    }
+    oscillators.forEach(d => {
+        d.freq(0, 0);
+        d.amp(0, 0);
+    })
 }
 
 function noteAmountInputChange () {
     noteAmount = this.value()
+    smallGridMatrix = []
+    for (let i = 0; i < gridAmount * noteAmount * gridAmount * noteAmount; i++) {
+        let obj = { r: 0, g: 0, b: 0 }
+        smallGridMatrix.push(obj)
+    }
+    oscillators.forEach(d => {
+        d.freq(0, 0);
+        d.amp(0, 0);
+    })
+}
+
+function handleFile (file) {
+    if (file.type === 'image') {
+        loadImage(file.data, d => {
+            img = d
+        })
+    } else {
+        console.log('a')
+        img = null
+    }
 }
 
 function restartLoop () {
@@ -148,14 +186,13 @@ function restartLoop () {
     noteX = -1
     noteY = 0
     direction = 0
-
-    smallGridMatrix = new Array(gridAmount * noteAmount * gridAmount * noteAmount).fill({ r: 0, g: 0, b: 0 })
 }
 
 function draw () {
-    console.log(smallGridMatrix)
+    //loadPixels
+    let media = img ? img : capture
     sizing()
-    scaling()
+    scaling(media)
 
     background(255)
 
@@ -164,25 +201,28 @@ function draw () {
     fill(0)
     text('Grid per side: ', windowWidth / 2 - 133, 47 + inputMargin)
     text('Notes per grid: ', windowWidth / 2 - 146, 77 + inputMargin)
+    text('Upload image: ', windowWidth / 2 - 130, 107 + inputMargin)
     //draw base
     fill(0)
     rect(marginLeft + smallGridSize * smallGridAmount / 2, marginTop + smallGridSize * smallGridAmount / 2, smallGridSize * smallGridAmount)
     //fill(64)
     //rect(marginLeft + smallGridSize * smallGridAmount / 2, marginTop + marginTop + smallGridSize * smallGridAmount / 2, smallGridSize * smallGridAmount + 20)
 
-    //loadPixels
+
+
     colR = 0
     colG = 0
     colB = 0
-    capture.loadPixels()
+
+    media.loadPixels()
     //draw grids from capture color
     for (let j = 0; j < smallGridAmount; j++) {
         for (let i = 0; i < smallGridAmount; i++) {
-            let start = (captureStartY * capture.width + captureStartX) * 4
-            let p = start + (j * capture.width * captureScale + i * captureScale) * 4
-            r = capture.pixels[p]
-            g = capture.pixels[p + 1]
-            b = capture.pixels[p + 2]
+            let start = (mediaStartY * media.width + mediaStartX) * 4
+            let p = start + (j * media.width * mediaScale + i * mediaScale) * 4
+            let r = media.pixels[p]
+            let g = media.pixels[p + 1]
+            let b = media.pixels[p + 2]
             let brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b
             push()
             translate(marginLeft + i * smallGridSize + smallGridSize / 2, marginTop + j * smallGridSize + smallGridSize / 2)
@@ -196,7 +236,7 @@ function draw () {
             smallGridMatrix[smallGridAmount * j + i].b = b
         }
     }
-    capture.updatePixels()
+    media.updatePixels()
 
     //draw grid outline
     for (let i = 0; i < gridAmount; i++) {
@@ -222,10 +262,22 @@ function draw () {
     noStroke()
     rect(marginLeft + noteX * smallGridSize * noteAmount + smallGridSize * noteAmount / 2, marginTop + noteY * smallGridSize * noteAmount + smallGridSize * noteAmount / 2, smallGridSize * noteAmount)
 
+    //play the current note
+    let startNote = noteX * noteAmount + noteY * smallGridAmount * noteAmount
+    for (let i = 0; i < noteAmount; i++) {
+        for (let j = 0; j < noteAmount; j++) {
+            let note = smallGridMatrix[startNote + i + j * smallGridAmount]
+            if (note) {
+                oscillators[i + j * noteAmount].freq(pow((note.r + note.g + note.b) / 3 / 4, 2));
+                oscillators[i + j * noteAmount].amp(1 / noteAmount / noteAmount)
+            }
+        }
+    }
+
     //timer
     now = millis()
     if (state == 'play') {
-        if (now - then > 500) {
+        if (now - then > timeInterval) {
             then = millis()
             //if reached center restart the loop
             if (noteX == int((gridAmount - 1) / 2) && noteY == int(gridAmount / 2)) {
@@ -271,13 +323,7 @@ function draw () {
         }
     }
 
-    //osc
-    sinOsc.freq(pow(colR, 1.4), 0.1);
-    triOsc.freq(pow(colG, 1.4), 0.1);
-    sqrOsc.freq(pow(colB, 1.4), 0.1);
-    sinOsc.amp(0.3, 0.1)
-    triOsc.amp(0.3, 0.1)
-    sqrOsc.amp(0.3, 0.1)
+
 }
 
 function windowResized () {
