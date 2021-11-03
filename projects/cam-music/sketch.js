@@ -78,8 +78,9 @@ function setup () {
                 }
             }
         })
+    } else {
+        capture = createCapture(VIDEO)
     }
-    capture = createCapture(VIDEO)
     capture.hide()
 
     gridMatrix = new Array(gridAmount * gridAmount).fill(0)
