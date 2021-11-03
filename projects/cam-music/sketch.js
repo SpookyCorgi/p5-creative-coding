@@ -69,6 +69,16 @@ function setup () {
     soundAmountInput.input(noteAmountInputChange)
 
     //capture and scale
+    if (windowWidth < 1080) {
+        capture = createCapture({
+            audio: false,
+            video: {
+                facingMode: {
+                    exact: "environment"
+                }
+            }
+        })
+    }
     capture = createCapture(VIDEO)
     capture.hide()
 
