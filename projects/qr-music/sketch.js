@@ -29,7 +29,7 @@ let now = 0
 let then = 0
 
 //state
-let state = 'play'
+let state = 'pause'
 let mode = 'image'
 
 //osc
@@ -100,7 +100,7 @@ function setup () {
     });
 
     //capture and scale
-    /*if (isMobileDevice()) {
+    if (isMobileDevice()) {
         capture = createCapture({
             audio: false,
             video: {
@@ -109,13 +109,12 @@ function setup () {
                 }
             }
         })
-    } else {*/
-    capture = createCapture(VIDEO)
-    //}
-
-
+    } else {
+        capture = createCapture(VIDEO)
+    }
     capture.hide()
 
+    //init grid matrix
     gridMatrix = new Array(gridAmount * gridAmount).fill(0)
     for (let i = 0; i < gridAmount * noteAmount * gridAmount * noteAmount; i++) {
         let obj = { r: 0, g: 0, b: 0 }
@@ -128,7 +127,6 @@ function setup () {
         o.freq(0, 0);
         o.amp(0, 0);
         oscillators.push(o);
-        o.start()
     }
 }
 
@@ -165,6 +163,7 @@ function imgScaling (media) {
 }
 
 function captureScaling (media) {
+    //scale capture to screen
     let mediaRatio = media.width / media.height
     let screenRatio = windowWidth / windowHeight
     if (screenRatio > mediaRatio) {
@@ -179,6 +178,7 @@ function captureScaling (media) {
 function mouseClicked () {
     //if mouse is not at the input area
     if (mouseY > marginTop) {
+        //play or stop notes
         if (state == 'play') {
             state = 'pause'
             oscillators.forEach(d => {
@@ -190,7 +190,7 @@ function mouseClicked () {
                 d.start()
             })
         }
-
+        //capture camera
         if (mode == 'capturing') {
             img = capture.get(int((captureStartX + marginLeft) / screenCaptureScale),
                 int((captureStartY + marginTop) / screenCaptureScale),
@@ -204,6 +204,7 @@ function mouseClicked () {
         }
     }
 }
+
 //callback function when there is inputs
 function gridAmountInputChange () {
     gridAmount = this.value()
@@ -238,13 +239,14 @@ function speedInputChange () {
 }
 
 function draw () {
+    //calculate grid sizes
     sizing()
-
     switch (mode) {
+        //play image
         case 'image': {
             imgScaling(img)
             background(255)
-
+            //color correction, not effective so it's not being used yet
             if (colorCorrection && colorCorrectImg) {
                 image(colorCorrectImg, 0, 0, colorCorrectImg.width, colorCorrectImg.height)
                 colorCorrectImg.loadPixels()
@@ -263,9 +265,11 @@ function draw () {
             text('Grid per side: ', windowWidth / 2, 40 + inputMargin)
             text('Notes per grid: ', windowWidth / 2, 65 + inputMargin)
             text('BPM: ', windowWidth / 2, 90 + inputMargin)
+
             //draw base
             rect(marginLeft + smallGridSize * smallGridAmount / 2, marginTop + smallGridSize * smallGridAmount / 2, smallGridSize * smallGridAmount)
             img.loadPixels()
+
             //draw grids from capture color
             for (let j = 0; j < smallGridAmount; j++) {
                 for (let i = 0; i < smallGridAmount; i++) {
@@ -274,7 +278,7 @@ function draw () {
                     let r = img.pixels[p]
                     let g = img.pixels[p + 1]
                     let b = img.pixels[p + 2]
-
+                    //unused color correction
                     if (colorCorrection) {
                         r *= colorScaleR
                         g *= colorScaleG
@@ -286,7 +290,7 @@ function draw () {
                     fill(r, g, b)
                     rect(0, 0, smallGridSize * 19 / 20)
                     pop()
-
+                    //store rgb value of each grid
                     smallGridMatrix[smallGridAmount * j + i].r = r
                     smallGridMatrix[smallGridAmount * j + i].g = g
                     smallGridMatrix[smallGridAmount * j + i].b = b
@@ -355,7 +359,7 @@ function draw () {
             //capture.get in mouseclicked stops the capture playing, so we have to use capture.get here too
             let cap = capture.get(0, 0, capture.width, capture.height)
             image(cap, -captureStartX, -captureStartY, capture.width * screenCaptureScale, capture.height * screenCaptureScale)
-            //black border
+            //black border for blur out effect
             let c = color(0, 0, 0)
             c.setAlpha(160)
             noStroke()
