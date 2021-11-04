@@ -80,7 +80,7 @@ function setup () {
     soundAmountInput.position(windowWidth / 2, 50)
     soundAmountInput.size(100)
     soundAmountInput.input(noteAmountInputChange)
-    speedInput = createSlider(100, 1000, 400)
+    speedInput = createSlider(30, 360, 120)
     speedInput.position(windowWidth / 2, 75)
     speedInput.size(100)
     speedInput.input(speedInputChange)
@@ -235,7 +235,7 @@ function noteAmountInputChange () {
 }
 
 function speedInputChange () {
-    timeInterval = this.value()
+    timeInterval = 60 * 1000 / this.value()
 }
 
 function draw () {
