@@ -5,13 +5,14 @@ let smallGridAmount
 let marginLeft
 let marginTop
 let extraMarginTop = 160
-let extraMarginDown = 20
+let extraMarginDown = 160
 let extraMarginX = 20
 let smallGridSize
 
 //capture
 let capture
 let img
+let colorCorrectImg
 let mediaStartX = 0
 let mediaStartY = 0
 let mediaScale = 1
@@ -37,19 +38,27 @@ let oscillatorLimit = 16
 //input
 let gridAmountInput
 let soundAmountInput
+let speedInput
 let fileButton
 let captureButton
 let inputMargin = 0
 
 //main variables, assume each note is a eighth note, with 120 bpm, 16 notes will 2 bars, 8 second
 let gridAmount = 4
-let noteAmount = 1
+let noteAmount = 2
 
 //bpm
-let timeInterval = 500
+let timeInterval = 400
+
+//color correction
+let colorCorrection = false
+let colorScaleR = 1
+let colorScaleG = 1
+let colorScaleB = 1
+let colorScaleBrightness = 1
 
 function preload () {
-    img = loadImage('img.png');
+    img = loadImage('star.png');
 }
 
 function setup () {
@@ -67,34 +76,43 @@ function setup () {
     gridAmountInput.position(windowWidth / 2, 25)
     gridAmountInput.size(100)
     gridAmountInput.input(gridAmountInputChange)
-    soundAmountInput = createSlider(1, 4, 1)
+    soundAmountInput = createSlider(1, 4, 2)
     soundAmountInput.position(windowWidth / 2, 50)
     soundAmountInput.size(100)
     soundAmountInput.input(noteAmountInputChange)
+    speedInput = createSlider(100, 1000, 400)
+    speedInput.position(windowWidth / 2, 75)
+    speedInput.size(100)
+    speedInput.input(speedInputChange)
     fileButton = createFileInput(handleFile)
-    fileButton.position(windowWidth / 2 - 100, 75)
+    fileButton.position(windowWidth / 2 - 100, 100)
     fileButton.size(200)
     captureButton = createButton('Take new photo')
-    captureButton.position(windowWidth / 2 - 100, 100)
+    captureButton.position(windowWidth / 2 - 100, 125)
     captureButton.size(120, 22)
     captureButton.style("font-size", "14px");
     captureButton.mousePressed(() => {
         mode = 'capturing'
+        state = 'pause'
+        oscillators.forEach(d => {
+            d.stop()
+        })
     });
 
     //capture and scale
+    /*if (isMobileDevice()) {
+        capture = createCapture({
+            audio: false,
+            video: {
+                facingMode: {
+                    exact: "environment"
+                }
+            }
+        })
+    } else {*/
+    capture = createCapture(VIDEO)
+    //}
 
-    capture = createCapture({
-        audio: false,
-        video: {
-            optional: [
-                {
-                    facingMode: {
-                        exact: "environment"
-                    }
-                }]
-        }
-    })
 
     capture.hide()
 
@@ -134,13 +152,9 @@ function sizing () {
     //calculate the padding outside grids
     marginLeft = (windowWidth - extraMarginX * 2 - smallGridSize * smallGridAmount) / 2 + extraMarginX
     marginTop = (windowHeight - extraMarginTop - extraMarginDown - smallGridSize * smallGridAmount) / 2 + extraMarginTop
-    if (windowWidth < 1080 && extraMarginTop) {
+    if ((windowWidth / windowHeight < 1) && extraMarginTop) {
         extraMarginTop = 0
-        inputMargin = 50
-        gridAmountInput.position(windowWidth / 2, 25 + inputMargin)
-        soundAmountInput.position(windowWidth / 2, 50 + inputMargin)
-        fileButton.position(windowWidth / 2 - 100, 75 + inputMargin)
-        captureButton.position(windowWidth / 2 - 100, 100 + inputMargin)
+        extraMarginDown = 0
         sizing()
     }
 }
@@ -182,6 +196,10 @@ function mouseClicked () {
                 int((captureStartY + marginTop) / screenCaptureScale),
                 int(gridAmount * smallGridSize * noteAmount / screenCaptureScale),
                 int(gridAmount * smallGridSize * noteAmount / screenCaptureScale))
+            colorCorrectImg = capture.get(int((captureStartX + marginLeft) / screenCaptureScale) + int(gridAmount * smallGridSize * noteAmount / screenCaptureScale) - int(smallGridSize * noteAmount / screenCaptureScale),
+                int((captureStartY + marginTop) / screenCaptureScale) + int(gridAmount * smallGridSize * noteAmount / screenCaptureScale),
+                int(smallGridSize * noteAmount / screenCaptureScale),
+                int(smallGridSize * noteAmount / screenCaptureScale))
             mode = 'image'
         }
     }
@@ -215,6 +233,10 @@ function noteAmountInputChange () {
     })
 }
 
+function speedInputChange () {
+    timeInterval = this.value()
+}
+
 function draw () {
     sizing()
 
@@ -222,11 +244,25 @@ function draw () {
         case 'image': {
             imgScaling(img)
             background(255)
+
+            if (colorCorrection && colorCorrectImg) {
+                image(colorCorrectImg, 0, 0, colorCorrectImg.width, colorCorrectImg.height)
+                colorCorrectImg.loadPixels()
+                let colorCorrectP = int(colorCorrectImg.pixels.length / 4 / 2) * 4
+                let colorCorrectR = colorCorrectImg.pixels[colorCorrectP]
+                let colorCorrectG = colorCorrectImg.pixels[colorCorrectP + 1]
+                let colorCorrectB = colorCorrectImg.pixels[colorCorrectP + 2]
+                colorScaleR = 128 / colorCorrectR
+                colorScaleG = 128 / colorCorrectG
+                colorScaleB = 128 / colorCorrectB
+            }
+
             //draw text for inputs
             textSize(16)
             fill(0)
             text('Grid per side: ', windowWidth / 2, 40 + inputMargin)
             text('Notes per grid: ', windowWidth / 2, 65 + inputMargin)
+            text('BPM: ', windowWidth / 2, 90 + inputMargin)
             //draw base
             rect(marginLeft + smallGridSize * smallGridAmount / 2, marginTop + smallGridSize * smallGridAmount / 2, smallGridSize * smallGridAmount)
             img.loadPixels()
@@ -234,10 +270,16 @@ function draw () {
             for (let j = 0; j < smallGridAmount; j++) {
                 for (let i = 0; i < smallGridAmount; i++) {
                     let start = (mediaStartY * img.width + mediaStartX) * 4
-                    let p = start + (int((j + 0.5) * img.width * mediaScale) + int((i + 0.5) * mediaScale)) * 4
+                    let p = start + (j * img.width * mediaScale + int(mediaScale / 2) * img.width + int((i + 0.5) * mediaScale)) * 4
                     let r = img.pixels[p]
                     let g = img.pixels[p + 1]
                     let b = img.pixels[p + 2]
+
+                    if (colorCorrection) {
+                        r *= colorScaleR
+                        g *= colorScaleG
+                        b *= colorScaleB
+                    }
                     push()
                     translate(marginLeft + i * smallGridSize + smallGridSize / 2, marginTop + j * smallGridSize + smallGridSize / 2)
                     noStroke()
@@ -283,7 +325,7 @@ function draw () {
                     let note = smallGridMatrix[startNote + i + j * smallGridAmount]
                     if (note) {
                         oscillators[i + j * noteAmount].freq(pow((note.r + note.g + note.b) / 3 / 4, 2));
-                        oscillators[i + j * noteAmount].amp(1 / noteAmount / noteAmount)
+                        oscillators[i + j * noteAmount].amp(1 / noteAmount)
                     }
                 }
             }
@@ -349,7 +391,7 @@ function draw () {
             //strokeWidth(1)
             text('Grid per side: ', windowWidth / 2, 40 + inputMargin)
             text('Notes per grid: ', windowWidth / 2, 65 + inputMargin)
-
+            text('BPM: ', windowWidth / 2, 90 + inputMargin)
             break
         }
     }
