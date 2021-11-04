@@ -3,10 +3,12 @@ let canvas
 //composition
 let smallGridAmount
 let marginLeft
-let extraMarginTop = 120
+let marginTop
+let extraMarginTop = 160
 let extraMarginDown = 20
 let extraMarginX = 20
 let smallGridSize
+
 //capture
 let capture
 let img
@@ -16,6 +18,7 @@ let mediaScale = 1
 let screenCaptureScale = 1
 let captureStartX = 0
 let captureStartY = 0
+
 //note playing
 let noteX = 0
 let noteY = 0
@@ -23,18 +26,19 @@ let smallGridMatrix = []
 //time
 let now = 0
 let then = 0
+
 //state
 let state = 'play'
-let mode = 'capture'
+let mode = 'image'
+
 //osc
-let colR = 0
-let colG = 0
-let colB = 0
 let oscillators = []
 let oscillatorLimit = 16
 //input
 let gridAmountInput
 let soundAmountInput
+let fileButton
+let captureButton
 let inputMargin = 0
 
 //main variables, assume each note is a eighth note, with 120 bpm, 16 notes will 2 bars, 8 second
@@ -45,7 +49,7 @@ let noteAmount = 1
 let timeInterval = 500
 
 function preload () {
-    //img = loadImage('img.png');
+    img = loadImage('img.png');
 }
 
 function setup () {
@@ -67,20 +71,31 @@ function setup () {
     soundAmountInput.position(windowWidth / 2, 50)
     soundAmountInput.size(100)
     soundAmountInput.input(noteAmountInputChange)
+    fileButton = createFileInput(handleFile)
+    fileButton.position(windowWidth / 2 - 100, 75)
+    fileButton.size(200)
+    captureButton = createButton('Take new photo')
+    captureButton.position(windowWidth / 2 - 100, 100)
+    captureButton.size(120, 22)
+    captureButton.style("font-size", "14px");
+    captureButton.mousePressed(() => {
+        mode = 'capturing'
+    });
 
     //capture and scale
-    if (windowWidth < 1080) {
-        capture = createCapture({
-            audio: false,
-            video: {
-                facingMode: {
-                    exact: "environment"
-                }
-            }
-        })
-    } else {
-        capture = createCapture(VIDEO)
-    }
+
+    capture = createCapture({
+        audio: false,
+        video: {
+            optional: [
+                {
+                    facingMode: {
+                        exact: "environment"
+                    }
+                }]
+        }
+    })
+
     capture.hide()
 
     gridMatrix = new Array(gridAmount * gridAmount).fill(0)
@@ -96,6 +111,14 @@ function setup () {
         o.amp(0, 0);
         oscillators.push(o);
         o.start()
+    }
+}
+
+function handleFile (file) {
+    if (file.type === 'image') {
+        loadImage(file.data, d => {
+            img = d
+        })
     }
 }
 
@@ -116,6 +139,8 @@ function sizing () {
         inputMargin = 50
         gridAmountInput.position(windowWidth / 2, 25 + inputMargin)
         soundAmountInput.position(windowWidth / 2, 50 + inputMargin)
+        fileButton.position(windowWidth / 2 - 100, 75 + inputMargin)
+        captureButton.position(windowWidth / 2 - 100, 100 + inputMargin)
         sizing()
     }
 }
@@ -152,12 +177,12 @@ function mouseClicked () {
             })
         }
 
-        if (mode == 'capture') {
+        if (mode == 'capturing') {
             img = capture.get(int((captureStartX + marginLeft) / screenCaptureScale),
                 int((captureStartY + marginTop) / screenCaptureScale),
                 int(gridAmount * smallGridSize * noteAmount / screenCaptureScale),
                 int(gridAmount * smallGridSize * noteAmount / screenCaptureScale))
-            mode = 'play'
+            mode = 'image'
         }
     }
 }
@@ -192,142 +217,149 @@ function noteAmountInputChange () {
 
 function draw () {
     sizing()
-    if (mode == 'capture') {
-        //scale capture
-        captureScaling(capture)
-        //draw capture
-        image(capture, -captureStartX, -captureStartY, capture.width * screenCaptureScale, capture.height * screenCaptureScale)
-        //black border
-        let c = color(0, 0, 0)
-        c.setAlpha(160)
-        noStroke()
-        fill(c)
-        rect(windowWidth / 2, marginTop / 2, windowWidth, marginTop)
-        rect(marginLeft / 2, marginTop + (windowHeight - marginTop) / 2, marginLeft, (windowHeight - marginTop))
-        rect(marginLeft + gridAmount * smallGridSize * noteAmount + marginLeft / 2, marginTop + (windowHeight - marginTop) / 2, marginLeft, (windowHeight - marginTop))
-        rect(windowWidth / 2, (marginTop + gridAmount * smallGridSize * noteAmount) / 2 + windowHeight / 2, windowWidth - marginLeft * 2, windowHeight - (marginTop + gridAmount * smallGridSize * noteAmount))
-        //draw grid outline
-        for (let i = 0; i < gridAmount; i++) {
-            for (let j = 0; j < gridAmount; j++) {
-                push()
-                translate(marginLeft + i * smallGridSize * noteAmount + smallGridSize * noteAmount / 2, marginTop + j * smallGridSize * noteAmount + smallGridSize * noteAmount / 2)
-                noFill()
-                stroke(color(0))
-                strokeWeight(10)
-                rect(0, 0, smallGridSize * noteAmount, smallGridSize * noteAmount, 10)
-                pop()
-            }
-        }
-        //draw smallgrids
-        for (let j = 0; j < smallGridAmount; j++) {
-            for (let i = 0; i < smallGridAmount; i++) {
-                noFill()
-                stroke(color(0))
-                strokeWeight(3)
-                rect(marginLeft + i * smallGridSize + smallGridSize / 2, marginTop + j * smallGridSize + smallGridSize / 2, smallGridSize, smallGridSize)
-            }
-        }
-        //draw input text
-        textSize(16)
-        fill(255)
-        //strokeWidth(1)
-        text('Grid per side: ', windowWidth / 2, 40 + inputMargin)
-        text('Notes per grid: ', windowWidth / 2, 65 + inputMargin)
-    } else {
-        imgScaling(img)
-        background(255)
-        //draw text for inputs
-        textSize(16)
-        fill(0)
-        text('Grid per side: ', windowWidth / 2, 40 + inputMargin)
-        text('Notes per grid: ', windowWidth / 2, 65 + inputMargin)
-        //draw base
-        fill(0)
-        rect(marginLeft + smallGridSize * smallGridAmount / 2, marginTop + smallGridSize * smallGridAmount / 2, smallGridSize * smallGridAmount)
 
-        colR = 0
-        colG = 0
-        colB = 0
+    switch (mode) {
+        case 'image': {
+            imgScaling(img)
+            background(255)
+            //draw text for inputs
+            textSize(16)
+            fill(0)
+            text('Grid per side: ', windowWidth / 2, 40 + inputMargin)
+            text('Notes per grid: ', windowWidth / 2, 65 + inputMargin)
+            //draw base
+            rect(marginLeft + smallGridSize * smallGridAmount / 2, marginTop + smallGridSize * smallGridAmount / 2, smallGridSize * smallGridAmount)
+            img.loadPixels()
+            //draw grids from capture color
+            for (let j = 0; j < smallGridAmount; j++) {
+                for (let i = 0; i < smallGridAmount; i++) {
+                    let start = (mediaStartY * img.width + mediaStartX) * 4
+                    let p = start + (int((j + 0.5) * img.width * mediaScale) + int((i + 0.5) * mediaScale)) * 4
+                    let r = img.pixels[p]
+                    let g = img.pixels[p + 1]
+                    let b = img.pixels[p + 2]
+                    push()
+                    translate(marginLeft + i * smallGridSize + smallGridSize / 2, marginTop + j * smallGridSize + smallGridSize / 2)
+                    noStroke()
+                    fill(r, g, b)
+                    rect(0, 0, smallGridSize * 19 / 20)
+                    pop()
 
-        img.loadPixels()
-        //draw grids from capture color
-        for (let j = 0; j < smallGridAmount; j++) {
-            for (let i = 0; i < smallGridAmount; i++) {
-                let start = (mediaStartY * img.width + mediaStartX) * 4
-                let p = start + (int((j + 0.5) * img.width * mediaScale) + int((i + 0.5) * mediaScale)) * 4
-                let r = img.pixels[p]
-                let g = img.pixels[p + 1]
-                let b = img.pixels[p + 2]
-                push()
-                translate(marginLeft + i * smallGridSize + smallGridSize / 2, marginTop + j * smallGridSize + smallGridSize / 2)
-                noStroke()
-                fill(r, g, b)
-                rect(0, 0, smallGridSize * 19 / 20)
-                pop()
-
-                smallGridMatrix[smallGridAmount * j + i].r = r
-                smallGridMatrix[smallGridAmount * j + i].g = g
-                smallGridMatrix[smallGridAmount * j + i].b = b
-            }
-        }
-        img.updatePixels()
-
-        //draw grid outline
-        for (let i = 0; i < gridAmount; i++) {
-            for (let j = 0; j < gridAmount; j++) {
-                push()
-                translate(marginLeft + i * smallGridSize * noteAmount + smallGridSize * noteAmount / 2, marginTop + j * smallGridSize * noteAmount + smallGridSize * noteAmount / 2)
-                noFill()
-                stroke(color(0))
-                strokeWeight(10)
-                rect(0, 0, smallGridSize * noteAmount, smallGridSize * noteAmount, 10)
-                pop()
-            }
-        }
-
-        //draw the current play note
-        let c = color(255)
-        stroke(c)
-        strokeWeight(5)
-        noFill()
-        rect(marginLeft + noteX * smallGridSize * noteAmount + smallGridSize * noteAmount / 2, marginTop + noteY * smallGridSize * noteAmount + smallGridSize * noteAmount / 2, smallGridSize * noteAmount, smallGridSize * noteAmount, 10)
-        c.setAlpha(128)
-        fill(c)
-        noStroke()
-        rect(marginLeft + noteX * smallGridSize * noteAmount + smallGridSize * noteAmount / 2, marginTop + noteY * smallGridSize * noteAmount + smallGridSize * noteAmount / 2, smallGridSize * noteAmount)
-
-        //play the current note
-        let startNote = noteX * noteAmount + noteY * smallGridAmount * noteAmount
-        for (let i = 0; i < noteAmount; i++) {
-            for (let j = 0; j < noteAmount; j++) {
-                let note = smallGridMatrix[startNote + i + j * smallGridAmount]
-                if (note) {
-                    oscillators[i + j * noteAmount].freq(pow((note.r + note.g + note.b) / 3 / 4, 2));
-                    oscillators[i + j * noteAmount].amp(1 / noteAmount / noteAmount)
+                    smallGridMatrix[smallGridAmount * j + i].r = r
+                    smallGridMatrix[smallGridAmount * j + i].g = g
+                    smallGridMatrix[smallGridAmount * j + i].b = b
                 }
             }
-        }
+            img.updatePixels()
 
-        //timer
-        now = millis()
-        if (state == 'play') {
-            if (now - then > timeInterval) {
-                then = millis()
-
-                noteX++
-                if (noteX == gridAmount) {
-                    noteX = 0
-                    noteY++
-                }
-                if (noteY == gridAmount) {
-                    noteY = 0
+            //draw grid outline
+            for (let i = 0; i < gridAmount; i++) {
+                for (let j = 0; j < gridAmount; j++) {
+                    push()
+                    translate(marginLeft + i * smallGridSize * noteAmount + smallGridSize * noteAmount / 2, marginTop + j * smallGridSize * noteAmount + smallGridSize * noteAmount / 2)
+                    noFill()
+                    stroke(color(0))
+                    strokeWeight(10)
+                    rect(0, 0, smallGridSize * noteAmount, smallGridSize * noteAmount, 10)
+                    pop()
                 }
             }
+
+            //draw the current play note
+            let c = color(255)
+            stroke(c)
+            strokeWeight(5)
+            noFill()
+            rect(marginLeft + noteX * smallGridSize * noteAmount + smallGridSize * noteAmount / 2, marginTop + noteY * smallGridSize * noteAmount + smallGridSize * noteAmount / 2, smallGridSize * noteAmount, smallGridSize * noteAmount, 10)
+            c.setAlpha(128)
+            fill(c)
+            noStroke()
+            rect(marginLeft + noteX * smallGridSize * noteAmount + smallGridSize * noteAmount / 2, marginTop + noteY * smallGridSize * noteAmount + smallGridSize * noteAmount / 2, smallGridSize * noteAmount)
+
+            //play the current note
+            let startNote = noteX * noteAmount + noteY * smallGridAmount * noteAmount
+            for (let i = 0; i < noteAmount; i++) {
+                for (let j = 0; j < noteAmount; j++) {
+                    let note = smallGridMatrix[startNote + i + j * smallGridAmount]
+                    if (note) {
+                        oscillators[i + j * noteAmount].freq(pow((note.r + note.g + note.b) / 3 / 4, 2));
+                        oscillators[i + j * noteAmount].amp(1 / noteAmount / noteAmount)
+                    }
+                }
+            }
+
+            //timer
+            now = millis()
+            if (state == 'play') {
+                if (now - then > timeInterval) {
+                    then = millis()
+
+                    noteX++
+                    if (noteX == gridAmount) {
+                        noteX = 0
+                        noteY++
+                    }
+                    if (noteY == gridAmount) {
+                        noteY = 0
+                    }
+                }
+            }
+            break
+        }
+        case 'capturing': {
+            //scale capture
+            captureScaling(capture)
+            //draw capture
+            //capture.get in mouseclicked stops the capture playing, so we have to use capture.get here too
+            let cap = capture.get(0, 0, capture.width, capture.height)
+            image(cap, -captureStartX, -captureStartY, capture.width * screenCaptureScale, capture.height * screenCaptureScale)
+            //black border
+            let c = color(0, 0, 0)
+            c.setAlpha(160)
+            noStroke()
+            fill(c)
+            rect(windowWidth / 2, marginTop / 2, windowWidth, marginTop)
+            rect(marginLeft / 2, marginTop + (windowHeight - marginTop) / 2, marginLeft, (windowHeight - marginTop))
+            rect(marginLeft + gridAmount * smallGridSize * noteAmount + marginLeft / 2, marginTop + (windowHeight - marginTop) / 2, marginLeft, (windowHeight - marginTop))
+            rect(windowWidth / 2, (marginTop + gridAmount * smallGridSize * noteAmount) / 2 + windowHeight / 2, windowWidth - marginLeft * 2, windowHeight - (marginTop + gridAmount * smallGridSize * noteAmount))
+            //draw grid outline
+            for (let i = 0; i < gridAmount; i++) {
+                for (let j = 0; j < gridAmount; j++) {
+                    push()
+                    translate(marginLeft + i * smallGridSize * noteAmount + smallGridSize * noteAmount / 2, marginTop + j * smallGridSize * noteAmount + smallGridSize * noteAmount / 2)
+                    noFill()
+                    stroke(color(0))
+                    strokeWeight(10)
+                    rect(0, 0, smallGridSize * noteAmount, smallGridSize * noteAmount, 10)
+                    pop()
+                }
+            }
+            //draw smallgrids
+            for (let j = 0; j < smallGridAmount; j++) {
+                for (let i = 0; i < smallGridAmount; i++) {
+                    noFill()
+                    stroke(color(0))
+                    strokeWeight(3)
+                    rect(marginLeft + i * smallGridSize + smallGridSize / 2, marginTop + j * smallGridSize + smallGridSize / 2, smallGridSize, smallGridSize)
+                }
+            }
+            //draw input text
+            textSize(16)
+            fill(255)
+            //strokeWidth(1)
+            text('Grid per side: ', windowWidth / 2, 40 + inputMargin)
+            text('Notes per grid: ', windowWidth / 2, 65 + inputMargin)
+
+            break
         }
     }
-
 }
 
 function windowResized () {
     resizeCanvas(windowWidth, windowHeight)
+}
+
+//https://coderwall.com/p/i817wa/one-line-function-to-detect-mobile-devices-with-javascript
+function isMobileDevice () {
+    return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
 }
