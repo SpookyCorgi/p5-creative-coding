@@ -4,6 +4,13 @@ let taiwanMap
 let mapScale
 let mapRatio
 let twData = []
+let points = []
+let waves = []
+const waveDelta = 4000
+const waveSpeed = 16
+const waveCount = 5
+const maxWaveRadius = 100
+
 function preload () {
     //https://simplemaps.com/resources/svg-tw
     //edit by myself to make it larger and easier to calculate longitude and latitude
@@ -30,6 +37,14 @@ function setup () {
         //turn table in to arrays of object
         let arr = Object.values(d.getObject())
         twData = arr.filter(d => (d.latitude <= 26) && (d.latitude >= 21.5) && (d.longitude <= 122.5) && (d.longitude >= 119))
+        twData.forEach(d => {
+            let w = []
+            for (let i = 0; i < waveCount; i++) {
+                w.push(millis() + waveDelta * i)
+            }
+            waves.push(w)
+        })
+
     })
     setInterval(() => {
         loadTable("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/1.0_month.csv", 'csv', 'header', d => {
@@ -62,12 +77,24 @@ function geoToPixel (lat, lon) {
 }
 
 function draw () {
+    background(255)
     image(taiwanMap, (windowWidth - taiwanMap.width * mapScale) / 2, (windowHeight - taiwanMap.height * mapScale) / 2, taiwanMap.width * mapScale, taiwanMap.height * mapScale)
-    let taipei = geoToPixel(23.9934, 120.7235)
-    twData.forEach(d => {
-        let pos = geoToPixel(d.latitude, d.longitude)
-        fill(255, 0, 0)
-        noStroke()
-        ellipse(pos.x, pos.y, d.mag * 5)
+    waves.forEach((w, i) => {
+        let pos = geoToPixel(twData[i].latitude, twData[i].longitude)
+        w.forEach(d => {
+            stroke(0)
+            if (millis() - d > 0) {
+                wave(pos.x, pos.y, (millis() - d) / waveDelta * waveSpeed)
+            }
+        })
     })
+}
+
+let pointPerRing = 50
+function wave (x, y, dis) {
+    dis = dis % maxWaveRadius
+    for (let i = 0; i < pointPerRing; i++) {
+        let angle = (TWO_PI / pointPerRing) * i - PI
+        point(x + cos(angle) * dis, y + sin(angle) * dis)
+    }
 }
