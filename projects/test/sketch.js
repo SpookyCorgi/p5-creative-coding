@@ -1,4 +1,18 @@
+//mta use some ugly data structure google developed
+//I spend hours trying to decode it without nodejs libraries,(static webpage) but in vain
+//so I'm using an api provided by other developer which they already convert the protobuf to json
+let stationNames
+
 function preload () {
+    httpGet('https://mtaapi.herokuapp.com/stations', 'json', res => {
+        stationNames = res.result
+        console.log(stationNames)
+        stationNames.forEach(d => {
+            if (d.name.includes('Jay')) {
+                console.log(d)
+            }
+        })
+    })
 
 }
 
@@ -12,14 +26,4 @@ function setup () {
 
 function draw () {
     background(255)
-    for (let i = 0; i < 10; i++) {
-        let x1 = random(windowWidth)
-        let y1 = random(windowHeight)
-        let angle = random(TWO_PI)
-        push()
-        fill(0)
-        rotate(angle)
-        rect(x1, y1, 2000, 100)
-        pop()
-    }
 }
