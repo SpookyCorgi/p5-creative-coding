@@ -53,6 +53,7 @@ function init () {
 }
 //fetch data from binance's api
 function getData () {
+    let date = Date.now()
     httpGet('https://api.binance.com/api/v3/ticker/price', 'json', res => {
         let topCoinsData = []
         trackingList.forEach((d, i) => {
@@ -65,7 +66,8 @@ function getData () {
         if (topCoinsPastData.length >= maxData) {
             topCoinsPastData.shift()
         }
-        topCoinsPastData.push({ data: topCoinsData, reset: lastResetData, time: Date.now() })
+        console.log(date)
+        topCoinsPastData.push({ data: topCoinsData, reset: lastResetData, time: date })
     })
 }
 
