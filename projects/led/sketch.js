@@ -116,7 +116,8 @@ function mouseClicked () {
 }
 
 function draw () {
-    if (latestData == 'waiting for data') {
+    console.log(latestData)
+    if (latestData == 'waiting for data' || latestData == 'Serial Port is Closed') {
         mode = 'auto'
     } else {
         mode = 'arduino'
