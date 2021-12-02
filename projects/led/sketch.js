@@ -1,14 +1,111 @@
-let leds
 let scale
+let ledSize
+let colors = []
+
+let mode = 'arduino'
+let r = 0
+
+let serial; // variable for the serial object
+let latestData = "waiting for data"; // variable to hold the data
+
+let leds = {
+    vertices: [
+        0, 1, 0,
+        -0.525731086730957, 0.8506507873535156, 0,
+        -0.30901700258255005, 0.80901700258255, 0.5,
+        0.30901700258255005, 0.80901700258255, 0.5,
+        0.525731086730957, 0.8506507873535156, 0,
+        0.30901700258255005, 0.80901700258255, -0.5,
+        -0.30901700258255005, 0.80901700258255, -0.5,
+        -0.80901700258255, 0.5, -0.30901700258255005,
+        -0.80901700258255, 0.5, 0.30901700258255005,
+        -0.5, 0.30901700258255005, 0.80901700258255,
+        0, 0.525731086730957, 0.8506507873535156,
+        0.5, 0.30901700258255005, 0.80901700258255,
+        0.80901700258255, 0.5, 0.30901700258255005,
+        0.80901700258255, 0.5, -0.30901700258255005,
+        0.5, 0.30901700258255005, -0.80901700258255,
+        0, 0.525731086730957, -0.8506507873535156,
+        -0.5, 0.30901700258255005, -0.80901700258255,
+        -0.8506507873535156, 0, -0.525731086730957,
+        -1, 0, 0,
+        -0.8506507873535156, 0, 0.525731086730957,
+        -0.5, -0.30901700258255005, 0.80901700258255,
+        0, 0, 1,
+        0.5, -0.30901700258255005, 0.80901700258255,
+        0.8506507873535156, 0, 0.525731086730957,
+        1, 0, 0,
+        0.8506507873535156, 0, -0.525731086730957,
+        0.5, -0.30901700258255005, -0.80901700258255,
+        0, 0, -1,
+        -0.5, -0.30901700258255005, -0.80901700258255,
+        -0.80901700258255, -0.5, -0.30901700258255005,
+        -0.80901700258255, -0.5, 0.30901700258255005,
+        -0.30901700258255005, -0.80901700258255, 0.5,
+        0, -0.525731086730957, 0.8506507873535156,
+        0.30901700258255005, -0.80901700258255, 0.5,
+        0.80901700258255, -0.5, 0.30901700258255005,
+        0.80901700258255, -0.5, -0.30901700258255005,
+        0.30901700258255005, -0.80901700258255, -0.5,
+        0, -0.525731086730957, -0.8506507873535156,
+        -0.30901700258255005, -0.80901700258255, -0.5,
+        -0.525731086730957, -0.8506507873535156, 0,
+        0, -1, 0,
+        0.525731086730957, -0.8506507873535156, 0,
+    ]
+}
+
 function setup () {
     canvas = createCanvas(windowWidth, windowHeight, WEBGL)
     canvas.position(0, 0)
     canvas.style('z-index', '-1')
 
-    leds = icosphere((order = 1), (uvMap = false));
-    scale = windowWidth / 5
+    //init sphere and scale
+    //the icosphere is generated using this function and then manually sorted for future physical device
+    //leds = icosphere((order = 1), (uvMap = false));
+    scale = windowWidth / 4.5
+    ledSize = windowWidth / 200
+    if (windowWidth < windowHeight) {
+        scale = windowWidth / 3
+        ledSize = windowWidth / 100
+    }
+
     angleMode(DEGREES);
+    //init color
+    for (let i = 0; i < 42; i++) {
+        colors[i] = color(100, random(150, 255), random(150, 255))
+    }
+
+    // serial constructor
+    serial = new p5.SerialPort()
+    // get a list of all connected serial devices
+    serial.list()
+    // serial port to use - you'll need to change this
+    serial.open('/dev/tty.usbmodem14501')
+    // callback for when the sketchs connects to the server
+    serial.on('connected', serverConnected)
+    // callback to print the list of serial devices
+    serial.on('list', gotList)
+    // what to do when we get serial data
+    serial.on('data', gotData)
+    // what to do when there's an error
+    serial.on('error', gotError)
+    // when to do when the serial port opens
+    serial.on('open', gotOpen)
+    // what to do when the port closes
+    serial.on('close', gotClose)
 }
+
+function windowResized () {
+    resizeCanvas(windowWidth, windowHeight)
+    scale = windowWidth / 4.5
+    ledSize = windowWidth / 200
+    if (windowWidth < windowHeight) {
+        scale = windowWidth / 3
+        ledSize = windowWidth / 100
+    }
+}
+
 
 let currentLed = 0
 function mouseClicked () {
@@ -18,48 +115,76 @@ function mouseClicked () {
     }
 }
 
-let r = 0;
 function draw () {
+    if (latestData == 'waiting for data') {
+        mode = 'auto'
+    } else {
+        mode = 'arduino'
+    }
+    let arr = latestData.split(" ");
+
     background(0);
-    r += 0.2
 
-    rotateZ(2 * r)
-    rotateY(1.5 * r)
-    rotateX(r)
+    if (mode == 'arduino') {
+        rotateY(parseFloat(arr[0]) + 180)
+        rotateZ(parseFloat(arr[2]))
+        rotateX(parseFloat(arr[1]))
+        strokeWeight(2)
+        stroke(255)
+        fill(50, 150, 150)
+        box(0.5 * scale, 0.1 * scale, 0.3 * scale)
+    } else {
+        r += 0.1
+        rotateY(r)
+        rotateZ(1.5 * r)
+        rotateX(2 * r)
+    }
 
-    //rotateX(2 * r)
-
-    //
     for (let i = 0; i < 42; i++) {
         push();
         let x = leds.vertices[i * 3] * scale
         let y = leds.vertices[i * 3 + 1] * scale
         let z = leds.vertices[i * 3 + 2] * scale
-        translate(
-            x,
-            y,
-            z
-        );
-        fill(i / 42 * 255, (42 - i) / 42 * 255, 255);
-        stroke(i / 42 * 255, (42 - i) / 42 * 255, 255);
-        let newPos = getRotatedPostion(r, 1.5 * r, 2 * r, x, y, z)
-        if (newPos[1] >= 0) {
+        translate(x, y, z);
+        fill(colors[i]);
+        stroke(colors[i]);
+        let newPos;
+        if (mode == 'arduino') {
+            newPos = getRotatedPostion(arr[0], arr[1], arr[2], x, y, z)
+        } else {
+            newPos = getRotatedPostion(r, 2 * r, 1.5 * r, x, y, z)
+        }
+        if (newPos[1] >= 0.2 * scale) {
             fill(255, 0, 0)
             stroke(255, 0, 0)
         }
-        sphere(10, 12, 9);
+        sphere(ledSize, 12, 9);
         pop();
+
+        if (i < 41) {
+            strokeWeight(0.2)
+            stroke(255);
+            line(leds.vertices[i * 3] * scale, leds.vertices[i * 3 + 1] * scale, leds.vertices[i * 3 + 2] * scale,
+                leds.vertices[(i + 1) * 3] * scale, leds.vertices[(i + 1) * 3 + 1] * scale, leds.vertices[(i + 1) * 3 + 2] * scale)
+        }
     }
 }
 
-function getRotatedPostion (row, yaw, pitch, x, y, z) {
+//helper function for rotation transform
+function getRotatedPostion (yaw, pitch, row, x, y, z) {
     let newX = x
     let newY = y
     let newZ = z
     let tmpX, tmpY, tmpZ
-    tmpY = newY * cos(row) - newZ * sin(row)
-    tmpZ = newY * sin(row) + newZ * cos(row)
+
+    tmpY = newY * cos(pitch) - newZ * sin(pitch)
+    tmpZ = newY * sin(pitch) + newZ * cos(pitch)
     newZ = tmpZ
+    newY = tmpY
+
+    tmpX = newX * cos(row) - newY * sin(row)
+    tmpY = newX * sin(row) + newY * cos(row)
+    newX = tmpX
     newY = tmpY
 
     tmpZ = newZ * cos(yaw) - newX * sin(yaw)
@@ -67,13 +192,48 @@ function getRotatedPostion (row, yaw, pitch, x, y, z) {
     newX = tmpX
     newZ = tmpZ
 
-    tmpX = newX * cos(pitch) - newY * sin(pitch)
-    tmpY = newX * sin(pitch) + newY * cos(pitch)
-    newX = tmpX
-    newY = tmpY
-
     return [newX, newY, newZ]
 }
+
+
+//code from scott
+
+function serverConnected () {
+    console.log("Connected to Server");
+}
+
+// list the ports
+function gotList (thelist) {
+    console.log("List of Serial Ports:");
+
+    for (let i = 0; i < thelist.length; i++) {
+        console.log(i + " " + thelist[i]);
+    }
+}
+
+function gotOpen () {
+    console.log("Serial Port is Open");
+}
+
+function gotClose () {
+    console.log("Serial Port is Closed");
+    latestData = "Serial Port is Closed";
+}
+
+function gotError (theerror) {
+    console.log(theerror);
+}
+
+// when data is received in the serial buffer
+
+function gotData () {
+    let currentString = serial.readLine(); // store the data in a variable
+    trim(currentString); // get rid of whitespace
+    if (!currentString) return; // if there's nothing in there, ignore it
+    console.log(currentString); // print it out
+    latestData = currentString; // save it to the global variable
+}
+
 
 //code from https://observablehq.com/@mourner/fast-icosphere-mesh
 icosphere = (order = 0) => {
@@ -86,11 +246,6 @@ icosphere = (order = 0) => {
         -1, f, 0, 1, f, 0, -1, -f, 0, 1, -f, 0,
         0, -1, f, 0, 1, f, 0, -1, -f, 0, 1, -f,
         f, 0, -1, f, 0, 1, -f, 0, -1, -f, 0, 1));
-    /*let triangles = Uint32Array.of(
-        0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11,
-        11, 10, 2, 5, 11, 4, 1, 5, 9, 7, 1, 8, 10, 7, 6,
-        3, 9, 4, 3, 4, 2, 3, 2, 6, 3, 6, 8, 3, 8, 9,
-        9, 8, 1, 4, 9, 5, 2, 4, 11, 6, 2, 10, 8, 6, 7);*/
     let triangles = Uint32Array.of(
         0, 11, 5,
         0, 5, 1,
