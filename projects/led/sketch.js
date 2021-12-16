@@ -69,12 +69,9 @@ function setup () {
     //init sphere and scale
     //the icosphere is generated using this function and then manually sorted for future physical device
     //leds = icosphere((order = 1), (uvMap = false));
-    scale = width / 4.5
+    scale = width / 3
     ledSize = width / 200
-    if (windowWidth < windowHeight) {
-        scale = width / 3
-        ledSize = width / 100
-    }
+
 
     angleMode(DEGREES);
     //init color
@@ -108,12 +105,8 @@ function windowResized () {
     } else {
         resizeCanvas(windowWidth * 0.3, windowWidth * 0.3, WEBGL)
     }
-    scale = width / 4.5
+    scale = width / 3
     ledSize = width / 200
-    if (windowWidth < windowHeight) {
-        scale = width / 3
-        ledSize = width / 100
-    }
 }
 
 
