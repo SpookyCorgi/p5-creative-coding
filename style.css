@@ -27,6 +27,10 @@ html, body, main {
        box-sizing: border-box;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 h1, h2, h3, h4 ,h5 ,h6, a{
   font-family: 'Rubik', sans-serif;
   color: #ffffff;
@@ -107,11 +111,7 @@ a{
   left:20px;
 }
 
-@media (min-width:992px){
-  .content{
-    width: 960px;
-  }
-}
+
 
 .tips{
   position: absolute;
@@ -154,4 +154,53 @@ button{
   width:100px;
   height:40px;
   font-size: 24px;
+}
+
+.led-img-container{
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-color: #000000;
+  padding-left:20px;
+  padding-right: 20px;
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.led-image{
+  display: flex;
+  padding:0;
+}
+
+.led-image img{
+  width: 100%;
+}
+
+video{
+  width: 100%;
+}
+
+.w-30-xl{
+  position: relative !important;
+}
+
+
+@media (min-width:992px){
+  .content{
+    width: 960px;
+  }
+
+  .w-30-xl{
+    width: 30%;
+  }
+
+  .led-image{
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+  }
 }

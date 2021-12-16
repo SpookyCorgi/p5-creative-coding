@@ -13,9 +13,53 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
     <!--ardiuno-->
     <script language="javascript" type="text/javascript" src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
+  <!--Google font-->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=Rubik:wght@300&display=swap"
+    rel="stylesheet">
 </head>
 
 <body>
+    <div class="led-img-container">
+        <h1 class="led-text">LED interactive ball</h1>
+        <div class="led-image w-30-xl">
+            <img src="main.jpg">
+        </div>
+        <h3 class="w-30-xl">Custom modeled, 3D printed case with led lights distributed within in an icosphere pattern. Four ultrasonic sensors and imu on the nano board are used in this project. Two buttons are attached to open the power and switch modes.</h3>
+        
+        <div class="led-image w-30-xl">
+            <img src="structure.jpg">
+        </div>
+        <h3 >Led structure simulation using p5.js</h3>
+        <div id="canvas-container"></div>
+
+        <h2>Interactive Animations</h2>
+        <h3 >Led brightness correlated to the angular velocity</h3>
+        <div class="led-image w-30-xl">
+            <video src="angular-velocity.mp4" muted autoplay loop></video>
+        </div>
+        <h3>Three stages of color patterns depend on how close an object is with the led ball</h3>
+        <div class="led-image w-30-xl">
+            <video src="dont-touch-me.mp4" muted autoplay loop></video>
+        </div>
+        <h3>Utilizing the imu on nano board, making the led located on the top and the bottom of the ball as seperate colors</h3>
+        <div class="led-image w-30-xl">
+            <video src="orientation.mp4" muted autoplay loop></video>
+        </div>
+
+
+        <h2>Basic Animations</h2>
+        <h3 >Chasing light animation</h3>
+        <div class="led-image w-30-xl">
+            <video  src="chase.mp4" muted autoplay loop></video>
+        </div>
+        <h3 >Carousel light animation</h3>
+        <div class="led-image w-30-xl">
+            <video src="carousel.mp4" muted autoplay loop></video>
+        </div>
+    </div>
+
     <script src="sketch.js"></script>
     <a class="home-btn black-shadow" href="../../index.html">
         <h3>Home</h3>

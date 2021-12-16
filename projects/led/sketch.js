@@ -56,18 +56,24 @@ let leds = {
 }
 
 function setup () {
-    canvas = createCanvas(windowWidth, windowHeight, WEBGL)
+    if (windowWidth >= 992) {
+        canvas = createCanvas(windowWidth * 0.3, windowWidth * 0.3, WEBGL)
+    } else {
+        canvas = createCanvas(windowWidth * 0.8, windowWidth * 0.8, WEBGL)
+    }
+
     canvas.position(0, 0)
-    canvas.style('z-index', '-1')
+    canvas.class('w-30-xl')
+    canvas.parent('#canvas-container')
 
     //init sphere and scale
     //the icosphere is generated using this function and then manually sorted for future physical device
     //leds = icosphere((order = 1), (uvMap = false));
-    scale = windowWidth / 4.5
-    ledSize = windowWidth / 200
+    scale = width / 4.5
+    ledSize = width / 200
     if (windowWidth < windowHeight) {
-        scale = windowWidth / 3
-        ledSize = windowWidth / 100
+        scale = width / 3
+        ledSize = width / 100
     }
 
     angleMode(DEGREES);
@@ -97,12 +103,16 @@ function setup () {
 }
 
 function windowResized () {
-    resizeCanvas(windowWidth, windowHeight)
-    scale = windowWidth / 4.5
-    ledSize = windowWidth / 200
+    if (windowWidth >= 992) {
+        resizeCanvas(windowWidth * 0.3, windowWidth * 0.3, WEBGL)
+    } else {
+        resizeCanvas(windowWidth * 0.3, windowWidth * 0.3, WEBGL)
+    }
+    scale = width / 4.5
+    ledSize = width / 200
     if (windowWidth < windowHeight) {
-        scale = windowWidth / 3
-        ledSize = windowWidth / 100
+        scale = width / 3
+        ledSize = width / 100
     }
 }
 
@@ -116,7 +126,6 @@ function mouseClicked () {
 }
 
 function draw () {
-    console.log(latestData)
     if (latestData == 'waiting for data' || latestData == 'Serial Port is Closed') {
         mode = 'auto'
     } else {
