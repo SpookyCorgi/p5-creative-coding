@@ -54,7 +54,7 @@ function init () {
 //fetch data from binance's api
 function getData () {
     let date = Date.now()
-    httpGet('https://api.binance.com/api/v3/ticker/price', 'json', res => {
+    httpGet('https://api.binance.us/api/v3/ticker/price', 'json', res => {
         let topCoinsData = []
         trackingList.forEach((d, i) => {
             topCoinsData[i] = res.find(c => c.symbol == trackingList[i] + 'USDT')
